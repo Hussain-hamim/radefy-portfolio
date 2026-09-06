@@ -1,13 +1,7 @@
 "use client";
 
-import { FormEvent } from "react";
+import Image from "next/image";
 import HeroWordmark from "./HeroWordmark";
-
-const PROJECTS = [
-  { name: "Finite", href: "#projects" },
-  { name: "Kyzenn", href: "#projects" },
-  { name: "SenseHawk", href: "#projects" },
-] as const;
 
 const LINKS = [
   { label: "Services", href: "#services" },
@@ -34,50 +28,47 @@ function SlideLink({
 }
 
 export default function SiteFooter() {
-  const onSubscribe = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    event.currentTarget.reset();
-  };
-
   return (
     <footer className="site-footer" id="contact">
+      <div className="footer-gradient" aria-hidden="true" />
+
       <div className="footer-inner">
-        <div className="footer-subscribe">
-          <p>Subscribe for new projects and insights, once a month.</p>
-          <form className="footer-form" onSubmit={onSubscribe}>
-            <label className="sr-only" htmlFor="footer-email">
-              Email
-            </label>
-            <input
-              id="footer-email"
-              type="email"
-              name="email"
-              required
-              placeholder="Email"
-              autoComplete="email"
+        <div className="footer-top">
+          <a className="footer-brand" href="#top" aria-label="Radefy Systems">
+            <Image
+              className="footer-logo"
+              src="/logo.png"
+              alt=""
+              width={536}
+              height={500}
             />
-            <button type="submit">Submit</button>
-          </form>
+            <span className="footer-brand-copy">
+              <span className="footer-brand-name">Radefy Systems</span>
+              <span className="footer-brand-tag">
+                defying the status quo
+              </span>
+            </span>
+          </a>
+
+          <div className="footer-cta" id="book">
+            <p>Ready to start?</p>
+            <SlideLink href="mailto:hello@radefysystems.com">
+              Book a discovery call
+            </SlideLink>
+          </div>
         </div>
 
         <div className="footer-grid">
           <div className="footer-col">
-            {PROJECTS.map((project) => (
-              <a key={project.name} className="footer-project" href={project.href}>
-                <span>{project.name}</span>
-                <span>View project</span>
-              </a>
-            ))}
-          </div>
-
-          <div className="footer-col">
+            <span className="footer-col-label">Contact</span>
             <SlideLink href="mailto:hello@radefysystems.com">
               hello@radefysystems.com
             </SlideLink>
-            <SlideLink href="#book">Book a call</SlideLink>
+            <a href="mailto:hello@radefysystems.com">New projects welcome</a>
           </div>
 
           <div className="footer-col">
+            <span className="footer-col-label">Explore</span>
             {LINKS.map((link) => (
               <a key={link.href} href={link.href}>
                 {link.label}
@@ -87,7 +78,7 @@ export default function SiteFooter() {
         </div>
       </div>
 
-      <div className="footer-wordmark-wrap" id="book">
+      <div className="footer-wordmark-wrap">
         <HeroWordmark word="Radefy" className="footer-wordmark" />
       </div>
     </footer>

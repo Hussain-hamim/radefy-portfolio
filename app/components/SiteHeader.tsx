@@ -7,7 +7,6 @@ const LINKS = [
   { label: "Projects", href: "#projects" },
   { label: "Services", href: "#services" },
   { label: "Solutions", href: "#workflow" },
-  { label: "Blog", href: "#blog" },
   { label: "Contact", href: "#contact" },
 ] as const;
 
@@ -17,34 +16,24 @@ export default function SiteHeader() {
   return (
     <header className={`site-header${open ? " is-open" : ""}`}>
       <div className="site-header-bar">
-          <a className="site-logo" href="#top" aria-label="Radefy Systems">
+          <a className="site-brand" href="#top" aria-label="Radefy Systems">
           <Image
+            className="site-logo"
             src="/logo.png"
             alt=""
             width={536}
             height={500}
             priority
           />
+          <span className="site-slogan">defying the status quo</span>
         </a>
 
         <nav className="site-nav-desktop" aria-label="Main navigation">
           {LINKS.map((link) => (
             <a key={link.href} className="nav-link" href={link.href}>
               <span className="nav-link-label">
-                <span>
-                  {link.label}
-                  {link.label === "Contact" ? (
-                    <i className="nav-arrow" aria-hidden="true">
-                      ↗
-                    </i>
-                  ) : null}
-                </span>
-                <span aria-hidden="true">
-                  {link.label}
-                  {link.label === "Contact" ? (
-                    <i className="nav-arrow">↗</i>
-                  ) : null}
-                </span>
+                <span>{link.label}</span>
+                <span aria-hidden="true">{link.label}</span>
               </span>
             </a>
           ))}

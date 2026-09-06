@@ -33,7 +33,6 @@ export default function Projects() {
       <header className="projects-header">
         <div className="projects-heading">
           <h2 className="projects-title">Projects</h2>
-          <p className="projects-count">({PROJECTS.length})</p>
         </div>
         <p className="projects-lede">
           Case studies that show how brand, web, and growth come together for

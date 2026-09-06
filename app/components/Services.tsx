@@ -43,7 +43,6 @@ export default function Services() {
       <header className="services-header">
         <div className="services-heading">
           <h2 className="services-title">Services</h2>
-          <p className="services-count">({SERVICES.length})</p>
         </div>
         <p className="services-lede">
           Brand, web, and the infrastructure behind it, handled end to end.
@@ -79,12 +78,14 @@ export default function Services() {
               </button>
 
               <div className="service-body">
-                <ul className="service-points">
-                  {service.points.map((point) => (
-                    <li key={point}>{point}</li>
-                  ))}
-                </ul>
-                <p className="service-copy">{service.copy}</p>
+                <div className="service-body-inner">
+                  <ul className="service-points">
+                    {service.points.map((point) => (
+                      <li key={point}>{point}</li>
+                    ))}
+                  </ul>
+                  <p className="service-copy">{service.copy}</p>
+                </div>
               </div>
             </article>
           );

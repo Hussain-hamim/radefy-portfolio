@@ -7,7 +7,7 @@ const QUOTES = [
   {
     name: "Alastair Frankl",
     company: "Finite",
-    image: "https://randomuser.me/api/portraits/men/45.jpg",
+    image: "/testimonials/alastair-frankl.jpg",
     before: "Their work easily rivals branding and web agencies. They integrated seamlessly with our team and have been a key player in our rebrand and digital transformation. ",
     highlight: "The brand and site finally feel like one company.",
     after: " Clear, fast, and always on the mark.",
@@ -15,7 +15,7 @@ const QUOTES = [
   {
     name: "Jason Mueller",
     company: "Kyzenn",
-    image: "https://randomuser.me/api/portraits/men/22.jpg",
+    image: "/testimonials/jason-mueller.jpg",
     before: "Radefy is in the top 1% at taking high-level direction and executing to completion. Their visual and product design sense is incredible, and ",
     highlight: "the ability to ship the final build was fast and always on the mark.",
     after: "",
@@ -23,7 +23,7 @@ const QUOTES = [
   {
     name: "Jill Pescosolido",
     company: "SenseHawk",
-    image: "https://randomuser.me/api/portraits/women/44.jpg",
+    image: "/testimonials/jill-pescosolido.jpg",
     before: "They built our website flawlessly in just three weeks. Professional, knowledgeable, and ",
     highlight: "one of the best web teams I have ever worked with.",
     after: "",
@@ -31,7 +31,7 @@ const QUOTES = [
   {
     name: "Andrew Shriver",
     company: "Fluxora",
-    image: "https://randomuser.me/api/portraits/men/36.jpg",
+    image: "/testimonials/andrew-shriver.jpg",
     before: "An invaluable resource to our team. Their mastery of design and engineering, paired with a deep understanding of our brand, ",
     highlight: "consistently delivers seamless, impactful work.",
     after: "",
@@ -91,23 +91,25 @@ export default function Testimonials() {
         </header>
 
         <article className="testimonials-body" key={quote.name}>
-          <div className="testimonials-photo">
-            <Image
-              src={quote.image}
-              alt=""
-              width={520}
-              height={520}
-              className="testimonials-photo-image"
-            />
-          </div>
-
           <div className="testimonials-quote">
             <p>
               “{quote.before}
               <strong>{quote.highlight}</strong>
               {quote.after}”
             </p>
-            <div className="testimonials-person">
+          </div>
+          <div className="testimonials-person">
+            <div className="testimonials-photo">
+              <Image
+                src={quote.image}
+                alt=""
+                width={160}
+                height={160}
+                quality={90}
+                className="testimonials-photo-image"
+              />
+            </div>
+            <div>
               <p className="testimonials-name">{quote.name}</p>
               <p className="testimonials-company">{quote.company}</p>
             </div>

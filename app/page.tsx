@@ -3,6 +3,7 @@ import HeroWordmark from "./components/HeroWordmark";
 import Projects from "./components/Projects";
 import Services from "./components/Services";
 import SiteHeader from "./components/SiteHeader";
+import BookButton from "./components/BookButton";
 import StartButton from "./components/StartButton";
 import Team from "./components/Team";
 import Tools from "./components/Tools";
@@ -29,20 +30,7 @@ export default function Home() {
 
             <div className="hero-actions">
               <StartButton />
-              <a className="book-btn" href="#book">
-                <span className="book-btn-label">
-                  <span>Book a call</span>
-                  <span aria-hidden="true">Book a call</span>
-                </span>
-                <span className="book-btn-arrow" aria-hidden="true">
-                  <svg viewBox="0 0 16 16" width="14" height="14">
-                    <path
-                      fill="currentColor"
-                      d="M3 8h8.2L8.1 4.9 9.5 3.5 13.9 8l-4.4 4.5-1.4-1.4L11.2 9H3z"
-                    />
-                  </svg>
-                </span>
-              </a>
+              <BookButton />
             </div>
           </div>
         </div>

@@ -62,30 +62,6 @@ const BRANDS = [
       </svg>
     ),
   },
-  {
-    name: "FlyCode",
-    style: "flycode",
-    mark: (
-      <svg viewBox="0 0 16 16" aria-hidden="true">
-        <path fill="currentColor" d="M2 8h8.2L7.4 4.2 8.8 2.8 14 8l-5.2 5.2-1.4-1.4L10.2 8H2V8Z" />
-      </svg>
-    ),
-  },
-  {
-    name: "Baladi",
-    style: "baladi",
-    mark: (
-      <svg viewBox="0 0 16 16" aria-hidden="true">
-        <circle cx="8" cy="8" r="6.2" fill="none" stroke="currentColor" strokeWidth="2" />
-        <circle cx="8" cy="8" r="2.2" fill="currentColor" />
-      </svg>
-    ),
-  },
-  {
-    name: "Enso",
-    style: "enso",
-    mark: null,
-  },
 ] as const;
 
 export default function About() {
@@ -98,17 +74,9 @@ export default function About() {
           who design, build, and ship it, then stay on to help you grow. No
           account managers, no junior handoffs.
         </p>
-        <p className="about-index">01</p>
       </div>
 
       <div className="about-brands">
-        <div className="about-brands-stars" aria-hidden="true">
-          <span />
-          <span />
-          <span />
-          <span />
-          <span />
-        </div>
         <p className="about-brands-label">
           Some of the brands we collaborate with
         </p>

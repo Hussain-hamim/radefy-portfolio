@@ -65,16 +65,30 @@ body {
   padding: 0 1.25rem;
 }
 
-.site-logo {
-  display: grid;
-  place-items: center;
+.site-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  min-width: 0;
   color: var(--navy);
+  text-decoration: none;
 }
 
-.site-logo img {
+.site-logo {
   display: block;
   width: 56px;
   height: auto;
+  flex-shrink: 0;
+}
+
+.site-slogan {
+  min-width: 0;
+  color: var(--navy);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  white-space: nowrap;
 }
 
 .site-nav-desktop {
@@ -151,13 +165,6 @@ body {
   line-height: 1;
   text-transform: uppercase;
   text-decoration: none;
-}
-
-.nav-arrow {
-  display: inline-block;
-  margin-left: 0.28em;
-  font-style: normal;
-  font-size: 0.85em;
 }
 
 .nav-link-label {
@@ -327,45 +334,66 @@ body {
 }
 
 .book-btn {
-  display: inline-flex;
+  position: relative;
+  display: inline-block;
+  margin: 0;
+  perspective: 800px;
+  text-decoration: none;
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.book-btn-depth {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background: #c9c6d8;
+  box-shadow:
+    0 10px 24px rgb(35 33 75 / 0.12),
+    0 2px 0 #9d99b4;
+  transform: translate3d(0, 8px, 0);
+}
+
+.book-btn-face {
+  position: relative;
+  z-index: 1;
+  display: flex;
   align-items: center;
   gap: 0.65rem;
   height: 44px;
-  padding: 0 10px 0 20px;
   overflow: hidden;
+  padding: 0 10px 0 20px;
   border: 1px solid rgb(35 33 75 / 0.16);
   border-radius: 999px;
-  background:
-    linear-gradient(180deg, #fff 0%, #f7f6fb 100%);
+  background: linear-gradient(180deg, #fff 0%, #f7f6fb 100%);
   color: var(--navy);
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  text-decoration: none;
   box-shadow:
     inset 0 1px 0 rgb(255 255 255 / 0.9),
-    0 8px 18px rgb(35 33 75 / 0.07);
+    inset 0 -1px 0 rgb(0 0 0 / 0.06);
+  transform: translate3d(0, 0, 10px);
+  transform-style: preserve-3d;
+  will-change: transform;
   transition:
     background 0.35s ease,
     border-color 0.35s ease,
-    color 0.35s ease,
-    box-shadow 0.35s ease,
-    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    color 0.35s ease;
 }
 
 .book-btn-label {
   display: flex;
   flex-direction: column;
-  height: 1em;
-  overflow: hidden;
+  height: 44px;
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .book-btn-label span {
   display: block;
-  height: 1em;
-  line-height: 1;
-  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  height: 44px;
+  line-height: 44px;
 }
 
 .book-btn-arrow {
@@ -386,16 +414,21 @@ body {
   display: block;
 }
 
-.book-btn:hover {
+.book-btn:hover .book-btn-face {
   background: var(--brand);
   border-color: var(--brand);
   color: #fff;
-  box-shadow: 0 12px 24px rgb(106 78 244 / 0.28);
-  transform: translateY(-2px);
 }
 
-.book-btn:hover .book-btn-label span {
-  transform: translateY(-1em);
+.book-btn:hover .book-btn-label {
+  transform: translateY(-44px);
+}
+
+.book-btn:hover .book-btn-depth {
+  transform: translate3d(0, 10px, 0);
+  box-shadow:
+    0 14px 28px rgb(106 78 244 / 0.28),
+    0 2px 0 #3f2db8;
 }
 
 .book-btn:hover .book-btn-arrow {
@@ -446,14 +479,6 @@ body {
   font-weight: 700;
   letter-spacing: -0.05em;
   line-height: 0.9;
-}
-
-.projects-count {
-  margin: 0.35rem 0 0;
-  color: rgb(35 33 75 / 0.7);
-  font-size: 0.875rem;
-  font-weight: 600;
-  letter-spacing: -0.02em;
 }
 
 .projects-lede {
@@ -544,13 +569,17 @@ body {
 }
 
 .about-label,
-.about-index,
 .about-brands-label {
   margin: 0;
   color: rgb(35 33 75 / 0.7);
   font-size: 0.875rem;
   font-weight: 600;
   letter-spacing: -0.02em;
+}
+
+.about-label {
+  font-size: clamp(1.15rem, 2.2vw, 1.5rem);
+  letter-spacing: -0.03em;
 }
 
 .about-copy {
@@ -565,30 +594,6 @@ body {
 
 .about-brands {
   margin-top: 4rem;
-}
-
-.about-brands-stars {
-  display: flex;
-  gap: 0.28rem;
-  margin-bottom: 0.7rem;
-}
-
-.about-brands-stars span {
-  width: 10px;
-  height: 10px;
-  background: #111;
-  clip-path: polygon(
-    50% 0%,
-    61% 35%,
-    98% 35%,
-    68% 57%,
-    79% 91%,
-    50% 70%,
-    21% 91%,
-    32% 57%,
-    2% 35%,
-    39% 35%
-  );
 }
 
 .about-brands-label {
@@ -684,6 +689,11 @@ body {
   letter-spacing: -0.02em;
 }
 
+.team-label {
+  font-size: clamp(1.15rem, 2.2vw, 1.5rem);
+  letter-spacing: -0.03em;
+}
+
 .team-stats {
   display: grid;
   grid-template-columns: 1fr;
@@ -747,6 +757,7 @@ body {
 }
 
 .team-avatar {
+  position: relative;
   display: block;
   width: 100%;
   aspect-ratio: 1;
@@ -756,11 +767,42 @@ body {
   box-shadow: 0 0 0 1px rgb(16 16 16 / 0.06);
 }
 
+.team-socials {
+  position: absolute;
+  right: 6px;
+  bottom: 6px;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.team-social {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #f0f0f0;
+  color: var(--navy);
+}
+
+.team-social:hover {
+  background: var(--navy);
+  color: #fff;
+}
+
 .team-avatar-image {
   display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  filter: grayscale(1);
+  transition: filter 0.35s ease;
+}
+
+.team-person:hover .team-avatar-image {
+  filter: none;
 }
 
 .team-person-name,
@@ -823,13 +865,6 @@ body {
   line-height: 0.9;
 }
 
-.services-count {
-  margin: 0.35rem 0 0;
-  color: rgb(35 33 75 / 0.7);
-  font-size: 0.875rem;
-  font-weight: 600;
-}
-
 .services-lede {
   margin: 0;
   max-width: 16rem;
@@ -885,6 +920,7 @@ body {
 
 .service-body {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   grid-template-rows: 0fr;
   overflow: hidden;
   transition: grid-template-rows 0.35s ease;
@@ -894,8 +930,10 @@ body {
   grid-template-rows: 1fr;
 }
 
-.service-body > * {
+.service-body-inner {
+  min-width: 0;
   min-height: 0;
+  overflow: hidden;
 }
 
 .service-points,
@@ -920,6 +958,7 @@ body {
 
 .service-copy {
   padding-left: 3.25rem;
+  overflow-wrap: break-word;
 }
 
 .services-note {
@@ -1153,7 +1192,7 @@ body {
   width: 100%;
   max-width: 1080px;
   margin: 0 auto;
-  padding: 2rem 1.5rem 2.25rem;
+  padding: 1.65rem 1.5rem 1.85rem;
   overflow: hidden;
   border-radius: 28px;
   background: #fff;
@@ -1164,7 +1203,7 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  margin-bottom: 2rem;
+  margin-bottom: 1.35rem;
 }
 
 .testimonials-title {
@@ -1206,7 +1245,10 @@ body {
 .testimonials-body {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 1.75rem;
+  gap: 1.35rem;
+  width: 100%;
+  min-height: 185px;
+  margin: 0 auto;
   animation: testimonials-fade 0.45s ease;
 }
 
@@ -1221,9 +1263,11 @@ body {
 }
 
 .testimonials-photo {
+  width: 64px;
+  height: 64px;
+  flex-shrink: 0;
   overflow: hidden;
-  aspect-ratio: 1;
-  border-radius: 24px;
+  border-radius: 18px;
   background: #ececec;
 }
 
@@ -1250,7 +1294,9 @@ body {
 }
 
 .testimonials-person {
-  margin-top: 1.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
 }
 
 .testimonials-name,
@@ -1275,69 +1321,101 @@ body {
 /* —— Footer —— */
 .site-footer {
   position: relative;
+  isolation: isolate;
   z-index: 2;
+  overflow: hidden;
   padding: 4.5rem 1.25rem 2.25rem;
   background: #fff;
 }
 
+.footer-gradient {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      180deg,
+      rgb(255 255 255 / 0) 28%,
+      rgb(106 78 244 / 0.28) 58%,
+      rgb(106 78 244 / 0.72) 82%,
+      #6a4ef4 100%
+    ),
+    radial-gradient(125% 125% at 50% 10%, #ffffff 38%, #6a4ef4 100%);
+  background-size: 100% 100%;
+}
+
 .footer-inner {
+  position: relative;
+  z-index: 1;
   width: 100%;
   max-width: 1080px;
   margin: 0 auto;
 }
 
-.footer-subscribe {
+.footer-top {
   display: flex;
   flex-direction: column;
-  gap: 1.1rem;
-  max-width: 22rem;
-  margin-bottom: 3rem;
+  gap: 2rem;
+  margin-bottom: 3.25rem;
+  padding-bottom: 2.5rem;
+  border-bottom: 1px solid rgb(16 16 16 / 0.1);
 }
 
-.footer-subscribe p {
-  margin: 0;
+.footer-brand {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  max-width: 28rem;
+  color: var(--navy);
+  text-decoration: none;
+}
+
+.footer-logo {
+  display: block;
+  width: 52px;
+  height: auto;
+  flex-shrink: 0;
+}
+
+.footer-brand-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  min-width: 0;
+  padding-top: 0.15rem;
+}
+
+.footer-brand-name {
   color: var(--navy);
   font-size: 1.05rem;
-  font-weight: 600;
-  line-height: 1.35;
+  font-weight: 700;
   letter-spacing: -0.03em;
+  line-height: 1.2;
 }
 
-.footer-form {
-  display: flex;
-  align-items: center;
-  gap: 0.85rem;
-  padding-bottom: 0.55rem;
-  border-bottom: 1px solid rgb(16 16 16 / 0.16);
-}
-
-.footer-form input {
-  flex: 1;
-  min-width: 0;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: var(--navy);
-  font: inherit;
+.footer-brand-tag {
+  color: rgb(35 33 75 / 0.62);
   font-size: 0.95rem;
   font-weight: 500;
-  outline: none;
+  line-height: 1.45;
+  letter-spacing: -0.02em;
 }
 
-.footer-form input::placeholder {
-  color: rgb(35 33 75 / 0.4);
+.footer-cta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.55rem;
 }
 
-.footer-form button {
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: var(--navy);
+.footer-cta p {
+  margin: 0;
+  color: rgb(35 33 75 / 0.45);
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  cursor: pointer;
 }
 
 .footer-grid {
@@ -1353,26 +1431,21 @@ body {
   gap: 0.7rem;
 }
 
+.footer-col-label {
+  margin-bottom: 0.15rem;
+  color: rgb(35 33 75 / 0.45);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
 .footer-col a {
   color: var(--navy);
   font-size: 0.92rem;
   font-weight: 600;
   letter-spacing: -0.02em;
   text-decoration: none;
-}
-
-.footer-project {
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-}
-
-.footer-project span:last-child {
-  color: rgb(35 33 75 / 0.45);
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
 }
 
 .footer-slide {
@@ -1401,6 +1474,8 @@ body {
 }
 
 .footer-wordmark-wrap {
+  position: relative;
+  z-index: 1;
   width: 100%;
   max-width: 1080px;
   margin: 3.5rem auto 0;
@@ -1456,8 +1531,12 @@ body {
     padding: 0 40px;
   }
 
-  .site-logo img {
+  .site-logo {
     width: 72px;
+  }
+
+  .site-slogan {
+    font-size: 0.88rem;
   }
 
   .site-nav-desktop {
@@ -1516,12 +1595,8 @@ body {
   }
 
   .about-inner {
-    grid-template-columns: minmax(10rem, 1fr) minmax(20rem, 2fr) minmax(6rem, 1fr);
+    grid-template-columns: minmax(10rem, 1fr) minmax(20rem, 2fr);
     align-items: start;
-  }
-
-  .about-index {
-    text-align: right;
   }
 
   .about-brands {
@@ -1584,15 +1659,10 @@ body {
     margin-bottom: 3.5rem;
   }
 
-  .service-body {
+  .service-body-inner {
     display: grid;
-    grid-template-columns: 2.5rem minmax(12rem, 1fr) minmax(14rem, 1.1fr);
-    grid-template-rows: 0fr;
+    grid-template-columns: 2.5rem minmax(0, 1fr) minmax(0, 1.1fr);
     column-gap: 0.75rem;
-  }
-
-  .service-item.is-open .service-body {
-    grid-template-rows: 1fr;
   }
 
   .service-points {
@@ -1674,30 +1744,58 @@ body {
   }
 
   .testimonials-card {
-    padding: 3.25rem 3.5rem 3.75rem;
+    padding: 2.15rem 3rem 2.5rem;
   }
 
   .testimonials-body {
-    grid-template-columns: minmax(16rem, 0.9fr) minmax(18rem, 1.15fr);
+    grid-template-columns: minmax(0, 7fr) minmax(13rem, 3fr);
     align-items: center;
-    gap: 3.5rem;
+    gap: 2.5rem;
+    min-height: 265px;
   }
 
   .testimonials-photo {
-    border-radius: 32px;
+    width: 72px;
+    height: 72px;
+    border-radius: 20px;
   }
 
   .testimonials-quote p {
-    font-size: 1.45rem;
+    font-size: 1.4rem;
   }
 
   .site-footer {
     padding: 6.5rem 2.5rem 2.75rem;
   }
 
+  .footer-top {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 3rem;
+    margin-bottom: 3.75rem;
+    padding-bottom: 3rem;
+  }
+
+  .footer-brand {
+    max-width: 32rem;
+  }
+
+  .footer-logo {
+    width: 60px;
+  }
+
+  .footer-brand-name {
+    font-size: 1.15rem;
+  }
+
+  .footer-brand-tag {
+    font-size: 1.02rem;
+  }
+
   .footer-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 2.5rem;
+    grid-template-columns: repeat(2, minmax(0, 14rem));
+    gap: 2.5rem 4rem;
   }
 
   .footer-wordmark-wrap {
@@ -1711,6 +1809,8 @@ body {
   .start-btn-face,
   .start-btn-depth,
   .book-btn,
+  .book-btn-face,
+  .book-btn-depth,
   .book-btn-label span,
   .book-btn-arrow,
   .project-card,
