@@ -1,9 +1,10 @@
-import About from "./components/About";
+import BookButton from "./components/BookButton";
+import HeroIntro from "./components/HeroIntro";
 import HeroWordmark from "./components/HeroWordmark";
+import About from "./components/About";
 import Projects from "./components/Projects";
 import Services from "./components/Services";
 import SiteHeader from "./components/SiteHeader";
-import BookButton from "./components/BookButton";
 import StartButton from "./components/StartButton";
 import Team from "./components/Team";
 import Tools from "./components/Tools";
@@ -21,8 +22,8 @@ export default function Home() {
         <div className="hero-main">
           <HeroWordmark />
 
-          <div className="hero-copy">
-            <p>
+          <HeroIntro>
+            <p className="hero-copy-text">
               A senior B2B brand and web studio. We design brands and the
               websites that carry them, built to the standard of the best work
               on the web, then help both grow.
@@ -32,7 +33,7 @@ export default function Home() {
               <StartButton />
               <BookButton />
             </div>
-          </div>
+          </HeroIntro>
         </div>
       </section>
 

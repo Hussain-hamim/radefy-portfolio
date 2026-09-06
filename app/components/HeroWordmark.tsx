@@ -124,6 +124,7 @@ export default function HeroWordmark({
 
     let frame = 0;
     let disposed = false;
+    let visible = true;
     let last = performance.now();
     let time = 0;
     let hover = 0;
@@ -257,7 +258,7 @@ export default function HeroWordmark({
       const width = canvas.clientWidth;
       const height = canvas.clientHeight;
       if (!width || !height) {
-        frame = requestAnimationFrame(draw);
+        if (visible && !reduceMotion) frame = requestAnimationFrame(draw);
         return;
       }
 
@@ -273,7 +274,7 @@ export default function HeroWordmark({
       ctx.drawImage(glCanvas, 0, 0, width, height);
       ctx.globalCompositeOperation = "source-over";
 
-      if (!reduceMotion) frame = requestAnimationFrame(draw);
+      if (visible && !reduceMotion) frame = requestAnimationFrame(draw);
     };
 
     const start = () => {
@@ -285,16 +286,33 @@ export default function HeroWordmark({
     void fontsReady.then(start);
     start();
 
-    const observer = new ResizeObserver(() => {
+    const resizeObserver = new ResizeObserver(() => {
       resize();
-      if (reduceMotion) draw(performance.now());
+      if (reduceMotion || !visible) draw(performance.now());
     });
-    observer.observe(canvas);
+    resizeObserver.observe(canvas);
+
+    const visibilityObserver = new IntersectionObserver(
+      ([entry]) => {
+        const nextVisible = Boolean(entry?.isIntersecting);
+        if (nextVisible === visible) return;
+        visible = nextVisible;
+        if (visible && !reduceMotion) {
+          last = performance.now();
+          frame = requestAnimationFrame(draw);
+        } else {
+          cancelAnimationFrame(frame);
+        }
+      },
+      { threshold: 0.05 },
+    );
+    visibilityObserver.observe(wrap);
 
     return () => {
       disposed = true;
       cancelAnimationFrame(frame);
-      observer.disconnect();
+      resizeObserver.disconnect();
+      visibilityObserver.disconnect();
       wrap.removeEventListener("pointerenter", onEnter);
       wrap.removeEventListener("pointerleave", onLeave);
       wrap.removeEventListener("pointermove", onMove);

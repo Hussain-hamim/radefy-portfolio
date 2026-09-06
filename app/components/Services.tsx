@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import ScrollReveal from "./ScrollReveal";
 
 const SERVICES = [
   {
@@ -40,22 +41,24 @@ export default function Services() {
 
   return (
     <section className="services" id="services">
-      <header className="services-header">
+      <ScrollReveal as="header" className="services-header">
         <div className="services-heading">
           <h2 className="services-title">Services</h2>
         </div>
         <p className="services-lede">
           Brand, web, and the infrastructure behind it, handled end to end.
         </p>
-      </header>
+      </ScrollReveal>
 
       <div className="services-list">
         {SERVICES.map((service, index) => {
           const isOpen = open === index;
           return (
-            <article
+            <ScrollReveal
               key={service.number}
+              as="article"
               className={`service-item${isOpen ? " is-open" : ""}`}
+              delay={index * 50}
             >
               <button
                 type="button"
@@ -87,15 +90,15 @@ export default function Services() {
                   <p className="service-copy">{service.copy}</p>
                 </div>
               </div>
-            </article>
+            </ScrollReveal>
           );
         })}
       </div>
 
-      <p className="services-note">
+      <ScrollReveal as="p" className="services-note" delay={120}>
         Need something more specific? Tell us and we will scope it.{" "}
         <a href="#book">Book a call</a>
-      </p>
+      </ScrollReveal>
     </section>
   );
 }

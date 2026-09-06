@@ -1,3 +1,6 @@
+import ScrollReveal from "./ScrollReveal";
+import type { CSSProperties } from "react";
+
 const STEPS = [
   {
     title: "Discover",
@@ -25,7 +28,7 @@ const STEPS = [
 export default function Flow() {
   return (
     <section className="flow" id="workflow">
-      <header className="flow-header">
+      <ScrollReveal as="header" className="flow-header">
         <div className="flow-header-left">
           <h2 className="flow-title">Flow</h2>
           <p className="flow-meta">
@@ -40,13 +43,20 @@ export default function Flow() {
             Duration: <strong>~ 1 month</strong>
           </p>
         </div>
-      </header>
+      </ScrollReveal>
 
       <ol className="flow-steps">
-        {STEPS.map((step) => (
-          <li
+        {STEPS.map((step, index) => (
+          <ScrollReveal
             key={step.title}
+            as="li"
             className={`flow-step${"accent" in step ? " has-accent" : ""}`}
+            delay={index * 100}
+            style={
+              {
+                ["--flow-progress"]: `${step.progress}%`,
+              } as CSSProperties
+            }
           >
             {"accent" in step ? (
               <span className="flow-step-accent" aria-hidden="true" />
@@ -54,12 +64,8 @@ export default function Flow() {
             <h3 className="flow-step-title">{step.title}</h3>
             <p className="flow-step-text">{step.copy}</p>
             <p className="flow-step-progress">{step.progress}%</p>
-            <span
-              className="flow-step-bar"
-              style={{ width: `${step.progress}%` }}
-              aria-hidden="true"
-            />
-          </li>
+            <span className="flow-step-bar" aria-hidden="true" />
+          </ScrollReveal>
         ))}
       </ol>
     </section>

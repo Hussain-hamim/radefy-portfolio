@@ -1,7 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import HeroWordmark from "./HeroWordmark";
+import RadefyLogo from "./RadefyLogo";
+import ScrollReveal from "./ScrollReveal";
 
 const LINKS = [
   { label: "Services", href: "#services" },
@@ -33,15 +34,9 @@ export default function SiteFooter() {
       <div className="footer-gradient" aria-hidden="true" />
 
       <div className="footer-inner">
-        <div className="footer-top">
+        <ScrollReveal as="div" className="footer-top">
           <a className="footer-brand" href="#top" aria-label="Radefy Systems">
-            <Image
-              className="footer-logo"
-              src="/logo.png"
-              alt=""
-              width={536}
-              height={500}
-            />
+            <RadefyLogo className="footer-logo" />
             <span className="footer-brand-copy">
               <span className="footer-brand-name">Radefy Systems</span>
               <span className="footer-brand-tag">
@@ -56,9 +51,9 @@ export default function SiteFooter() {
               Book a discovery call
             </SlideLink>
           </div>
-        </div>
+        </ScrollReveal>
 
-        <div className="footer-grid">
+        <ScrollReveal as="div" className="footer-grid" delay={100}>
           <div className="footer-col">
             <span className="footer-col-label">Contact</span>
             <SlideLink href="mailto:hello@radefysystems.com">
@@ -75,12 +70,12 @@ export default function SiteFooter() {
               </a>
             ))}
           </div>
-        </div>
+        </ScrollReveal>
       </div>
 
-      <div className="footer-wordmark-wrap">
+      <ScrollReveal as="div" className="footer-wordmark-wrap" delay={160}>
         <HeroWordmark word="Radefy" className="footer-wordmark" />
-      </div>
+      </ScrollReveal>
     </footer>
   );
 }

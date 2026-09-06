@@ -2,13 +2,15 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import ScrollReveal from "./ScrollReveal";
 
 const QUOTES = [
   {
     name: "Alastair Frankl",
     company: "Finite",
     image: "/testimonials/alastair-frankl.jpg",
-    before: "Their work easily rivals branding and web agencies. They integrated seamlessly with our team and have been a key player in our rebrand and digital transformation. ",
+    before:
+      "Their work easily rivals branding and web agencies. They integrated seamlessly with our team and have been a key player in our rebrand and digital transformation. ",
     highlight: "The brand and site finally feel like one company.",
     after: " Clear, fast, and always on the mark.",
   },
@@ -16,15 +18,18 @@ const QUOTES = [
     name: "Jason Mueller",
     company: "Kyzenn",
     image: "/testimonials/jason-mueller.jpg",
-    before: "Radefy is in the top 1% at taking high-level direction and executing to completion. Their visual and product design sense is incredible, and ",
-    highlight: "the ability to ship the final build was fast and always on the mark.",
+    before:
+      "Radefy is in the top 1% at taking high-level direction and executing to completion. Their visual and product design sense is incredible, and ",
+    highlight:
+      "the ability to ship the final build was fast and always on the mark.",
     after: "",
   },
   {
     name: "Jill Pescosolido",
     company: "SenseHawk",
     image: "/testimonials/jill-pescosolido.jpg",
-    before: "They built our website flawlessly in just three weeks. Professional, knowledgeable, and ",
+    before:
+      "They built our website flawlessly in just three weeks. Professional, knowledgeable, and ",
     highlight: "one of the best web teams I have ever worked with.",
     after: "",
   },
@@ -32,7 +37,8 @@ const QUOTES = [
     name: "Andrew Shriver",
     company: "Fluxora",
     image: "/testimonials/andrew-shriver.jpg",
-    before: "An invaluable resource to our team. Their mastery of design and engineering, paired with a deep understanding of our brand, ",
+    before:
+      "An invaluable resource to our team. Their mastery of design and engineering, paired with a deep understanding of our brand, ",
     highlight: "consistently delivers seamless, impactful work.",
     after: "",
   },
@@ -57,7 +63,7 @@ export default function Testimonials() {
 
   return (
     <section className="testimonials" id="testimonials">
-      <div className="testimonials-card">
+      <ScrollReveal as="div" className="testimonials-card">
         <header className="testimonials-header">
           <h2 className="testimonials-title">Testimonials</h2>
           <div className="testimonials-nav">
@@ -115,7 +121,7 @@ export default function Testimonials() {
             </div>
           </div>
         </article>
-      </div>
+      </ScrollReveal>
     </section>
   );
 }

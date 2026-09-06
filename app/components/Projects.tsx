@@ -1,4 +1,5 @@
 import Image from "next/image";
+import ScrollReveal from "./ScrollReveal";
 
 const PROJECTS = [
   {
@@ -30,7 +31,7 @@ const PROJECTS = [
 export default function Projects() {
   return (
     <section className="projects" id="projects">
-      <header className="projects-header">
+      <ScrollReveal as="header" className="projects-header">
         <div className="projects-heading">
           <h2 className="projects-title">Projects</h2>
         </div>
@@ -38,11 +39,17 @@ export default function Projects() {
           Case studies that show how brand, web, and growth come together for
           B2B teams.
         </p>
-      </header>
+      </ScrollReveal>
 
       <div className="projects-row">
-        {PROJECTS.map((project) => (
-          <a key={project.name} className="project-card" href={project.href}>
+        {PROJECTS.map((project, index) => (
+          <ScrollReveal
+            key={project.name}
+            as="a"
+            className="project-card"
+            delay={index * 80}
+            href={project.href}
+          >
             <span className="project-card-media">
               <Image
                 src={project.image}
@@ -56,7 +63,7 @@ export default function Projects() {
               <span className="project-card-name">{project.name}</span>
               <span className="project-card-tag">{project.category}</span>
             </span>
-          </a>
+          </ScrollReveal>
         ))}
       </div>
     </section>

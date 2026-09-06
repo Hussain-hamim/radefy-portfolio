@@ -1,3 +1,5 @@
+import ScrollReveal from "./ScrollReveal";
+
 const TOOLS = [
   {
     name: "Supabase",
@@ -171,14 +173,13 @@ const TOOLS = [
 
 function ToolRow({ hidden = false }: { hidden?: boolean }) {
   return (
-    <div
-      className="tools-row"
-      aria-hidden={hidden || undefined}
-    >
+    <div className="tools-row" aria-hidden={hidden || undefined}>
       {TOOLS.map((tool) => (
         <span key={tool.name} className="tools-logo">
           <span className="tools-logo-mark">{tool.mark}</span>
-          <span className="tools-logo-name">{"word" in tool ? tool.word : tool.name}</span>
+          <span className="tools-logo-name">
+            {"word" in tool ? tool.word : tool.name}
+          </span>
         </span>
       ))}
     </div>
@@ -188,16 +189,16 @@ function ToolRow({ hidden = false }: { hidden?: boolean }) {
 export default function Tools() {
   return (
     <section className="tools" id="tools">
-      <div className="tools-heading">
+      <ScrollReveal as="div" className="tools-heading">
         <h2 className="tools-title">Tools we’ve mastered</h2>
-      </div>
+      </ScrollReveal>
 
-      <div className="tools-pill">
+      <ScrollReveal as="div" className="tools-pill" delay={100}>
         <div className="tools-track">
           <ToolRow />
           <ToolRow hidden />
         </div>
-      </div>
+      </ScrollReveal>
     </section>
   );
 }

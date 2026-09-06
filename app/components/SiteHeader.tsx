@@ -1,7 +1,7 @@
 "use client";
 
-import Image from "next/image";
 import { useState } from "react";
+import RadefyLogo from "./RadefyLogo";
 
 const LINKS = [
   { label: "Projects", href: "#projects" },
@@ -16,15 +16,8 @@ export default function SiteHeader() {
   return (
     <header className={`site-header${open ? " is-open" : ""}`}>
       <div className="site-header-bar">
-          <a className="site-brand" href="#top" aria-label="Radefy Systems">
-          <Image
-            className="site-logo"
-            src="/logo.png"
-            alt=""
-            width={536}
-            height={500}
-            priority
-          />
+        <a className="site-brand" href="#top" aria-label="Radefy Systems">
+          <RadefyLogo className="site-logo" />
           <span className="site-slogan">defying the status quo</span>
         </a>
 

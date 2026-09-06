@@ -1,3 +1,5 @@
+import ScrollReveal from "./ScrollReveal";
+
 const BRANDS = [
   {
     name: "Finite",
@@ -67,27 +69,34 @@ const BRANDS = [
 export default function About() {
   return (
     <section className="about" id="about">
-      <div className="about-inner">
+      <ScrollReveal as="div" className="about-inner">
         <p className="about-label">Who we are</p>
         <p className="about-copy">
           The people who scope your brand and architecture are the same people
           who design, build, and ship it, then stay on to help you grow. No
           account managers, no junior handoffs.
         </p>
-      </div>
+      </ScrollReveal>
 
       <div className="about-brands">
-        <p className="about-brands-label">
-          Some of the brands we collaborate with
-        </p>
+        <ScrollReveal>
+          <p className="about-brands-label">
+            Some of the brands we collaborate with
+          </p>
+        </ScrollReveal>
         <ul className="about-brands-list">
-          {BRANDS.map((brand) => (
-            <li key={brand.name} className={`about-brand about-brand-${brand.style}`}>
+          {BRANDS.map((brand, index) => (
+            <ScrollReveal
+              key={brand.name}
+              as="li"
+              className={`about-brand about-brand-${brand.style}`}
+              delay={index * 60}
+            >
               {brand.mark ? (
                 <span className="about-brand-mark">{brand.mark}</span>
               ) : null}
               <span className="about-brand-name">{brand.name}</span>
-            </li>
+            </ScrollReveal>
           ))}
         </ul>
       </div>
