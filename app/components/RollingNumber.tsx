@@ -54,8 +54,8 @@ export default function RollingNumber({
     if (!node) return;
 
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setActive(true);
-      return;
+      const frame = window.requestAnimationFrame(() => setActive(true));
+      return () => window.cancelAnimationFrame(frame);
     }
 
     const observer = new IntersectionObserver(
