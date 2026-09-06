@@ -10,22 +10,22 @@ const PEOPLE = [
   {
     name: "Rahim Rad",
     role: "Founder",
-    image: "https://randomuser.me/api/portraits/men/32.jpg",
+    image: "/team/rahim-rad-v2.png",
   },
   {
     name: "Hussain Hamim",
     role: "Head of Sales",
-    image: "https://randomuser.me/api/portraits/men/11.jpg",
+    image: "/team/hussain-hamim-v2.png",
   },
   {
     name: "Rahmat Danish",
     role: "Project Manager",
-    image: "https://randomuser.me/api/portraits/men/52.jpg",
+    image: "/team/rahmat-danish-v2.png",
   },
   {
     name: "Samsoor Enzo",
     role: "Product Designer",
-    image: "https://randomuser.me/api/portraits/men/75.jpg",
+    image: "/team/samsoor-enzo-v2.png",
   },
 ] as const;
 
