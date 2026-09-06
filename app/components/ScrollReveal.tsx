@@ -6,6 +6,7 @@ import {
   type ReactNode,
   useEffect,
   useRef,
+  useState,
 } from "react";
 
 type ScrollRevealProps = {
@@ -28,21 +29,25 @@ export default function ScrollReveal({
   ...rest
 }: ScrollRevealProps) {
   const ref = useRef<HTMLElement | null>(null);
+  const [isInView, setIsInView] = useState(false);
 
   useEffect(() => {
     const node = ref.current;
     if (!node) return;
 
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      node.classList.add("is-inview");
-      return;
+      const frame = window.requestAnimationFrame(() => setIsInView(true));
+      return () => window.cancelAnimationFrame(frame);
     }
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (!entry?.isIntersecting) return;
-        node.classList.add("is-inview");
-        if (once) observer.unobserve(node);
+        if (entry?.isIntersecting) {
+          setIsInView(true);
+          if (once) observer.unobserve(node);
+        } else if (!once) {
+          setIsInView(false);
+        }
       },
       {
         rootMargin: "0px 0px -8% 0px",
@@ -57,7 +62,7 @@ export default function ScrollReveal({
   return (
     <Tag
       ref={ref}
-      className={`reveal${className ? ` ${className}` : ""}`}
+      className={`reveal${className ? ` ${className}` : ""}${isInView ? " is-inview" : ""}`}
       style={{
         ...style,
         ["--reveal-delay" as string]: `${delay}ms`,
