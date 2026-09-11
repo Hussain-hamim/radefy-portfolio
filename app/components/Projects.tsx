@@ -3,10 +3,10 @@ import ScrollReveal from "./ScrollReveal";
 
 const PROJECTS = [
   {
-    name: "Finite",
-    category: "Bitcoin / Talent Intelligence",
-    href: "#projects",
-    image: "/projects/finite.jpg",
+    name: "Radefy English Academy",
+    category: "Education / Academy Management",
+    href: "https://course-rad-sys.vercel.app/",
+    image: "/projects/radefy-english-academy.png",
   },
   {
     name: "Kyzenn",
@@ -49,6 +49,8 @@ export default function Projects() {
             className="project-card"
             delay={index * 80}
             href={project.href}
+            target={project.href.startsWith("http") ? "_blank" : undefined}
+            rel={project.href.startsWith("http") ? "noopener noreferrer" : undefined}
           >
             <span className="project-card-media">
               <Image

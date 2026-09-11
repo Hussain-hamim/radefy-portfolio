@@ -1,6 +1,6 @@
 "use client";
 
-import HeroWordmark from "./HeroWordmark";
+import PixelDrift from "./PixelDrift";
 import RadefyLogo from "./RadefyLogo";
 import ScrollReveal from "./ScrollReveal";
 
@@ -73,9 +73,27 @@ export default function SiteFooter() {
         </ScrollReveal>
       </div>
 
-      <ScrollReveal as="div" className="footer-wordmark-wrap" delay={160}>
-        <HeroWordmark word="Radefy" className="footer-wordmark" />
-      </ScrollReveal>
+      <div className="footer-wordmark-wrap">
+        <PixelDrift
+          text="Radefy Systems"
+          className="footer-wordmark"
+          colors={["#23214b", "#1a1838", "#2f2c5c"]}
+          particleSize={10}
+          particleCount={50}
+          mouseEnabled
+          mouseRadius={60}
+          mouseForce={30}
+          mode="onEnter"
+          replay
+          position="middle"
+          autoFit
+          transition={{
+            type: "tween",
+            duration: 1.6,
+            ease: [0.22, 1, 0.36, 1],
+          }}
+        />
+      </div>
     </footer>
   );
 }
