@@ -931,13 +931,66 @@ body {
 .services {
   position: relative;
   z-index: 2;
+  background: #fff;
+}
+
+.services-sticky {
   padding: 4.5rem 1.25rem 4.5rem;
   background: #fff;
 }
 
+.services--scroll .services-sticky {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  height: calc(100vh - 64px);
+  min-height: calc(100vh - 64px);
+  max-height: calc(100vh - 64px);
+  padding-top: 2rem;
+  padding-bottom: 1.5rem;
+  overflow: hidden;
+}
+
+.services--scroll .services-header {
+  flex-shrink: 0;
+  margin-bottom: 1.25rem;
+}
+
+.services--scroll .services-list-viewport {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  max-width: 1080px;
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+.services--scroll .services-list {
+  will-change: transform;
+}
+
+.services--scroll .services-list-spacer {
+  /* Just enough room to lift later rows — not a huge empty gap */
+  height: 11rem;
+  pointer-events: none;
+}
+
+.services--scroll .services-note {
+  flex-shrink: 0;
+  margin-top: 1.25rem;
+}
+
 .services-header,
 .services-list,
+.services-list-viewport,
 .services-note {
+  width: 100%;
+  max-width: 1080px;
+  margin: 0 auto;
+}
+
+.services-list-viewport {
   width: 100%;
   max-width: 1080px;
   margin: 0 auto;
@@ -1795,8 +1848,13 @@ body {
     border-radius: 32px;
   }
 
-  .services {
+  .services-sticky {
     padding: 6.5rem 2.5rem 6rem;
+  }
+
+  .services--scroll .services-sticky {
+    padding-top: 3.5rem;
+    padding-bottom: 3.5rem;
   }
 
   .services-header {
@@ -1963,6 +2021,17 @@ body {
     opacity: 1 !important;
     transform: none !important;
     transition: none !important;
+  }
+
+  .services--scroll .services-sticky {
+    min-height: 0;
+    height: auto;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .services--scroll .services-list {
+    transform: none !important;
   }
 
   .rolling-digit-track {
