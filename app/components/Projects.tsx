@@ -112,7 +112,12 @@ export default function Projects() {
   const animFrameRef = useRef(0);
   const animatingRef = useRef(false);
   const scrollFrameRef = useRef(0);
-  const metricsRef = useRef({ range: 0, stuckTop: 0, enabled: false });
+  const metricsRef = useRef({
+    range: 0,
+    stuckTop: 0,
+    pinDocTop: 0,
+    enabled: false,
+  });
   const dragRef = useRef<{
     pointerId: number;
     startX: number;
@@ -121,7 +126,25 @@ export default function Projects() {
     axis: "x" | "y" | null;
     dragging: boolean;
   } | null>(null);
+  const touchScrubRef = useRef<{
+    startX: number;
+    startY: number;
+    startScroll: number;
+    origin: number;
+    axis: "x" | "y" | null;
+    active: boolean;
+    passThrough: boolean;
+  } | null>(null);
+  const touchIgnoreTimerRef = useRef(0);
   const reduceMotionRef = useRef(false);
+
+  const scrollToY = useCallback((top: number) => {
+    const html = document.documentElement;
+    const previous = html.style.scrollBehavior;
+    html.style.scrollBehavior = "auto";
+    window.scrollTo({ top, left: 0, behavior: "auto" });
+    html.style.scrollBehavior = previous;
+  }, []);
 
   const paintVisual = useCallback((value: number, syncActive = true) => {
     const next = clamp(value, 0, LAST_INDEX);
@@ -182,22 +205,22 @@ export default function Projects() {
     [cancelAnimation, paintVisual],
   );
 
-  const syncScrollToIndex = useCallback((index: number) => {
-    const pin = pinRef.current;
-    const sticky = stickyRef.current;
-    const { enabled, range, stuckTop } = metricsRef.current;
-    if (!pin || !sticky || !enabled || range <= 0) return;
+  const syncScrollToIndex = useCallback(
+    (index: number) => {
+      const { enabled, range, stuckTop, pinDocTop } = metricsRef.current;
+      if (!enabled || range <= 0) return;
 
-    const pinDocTop = window.scrollY + pin.getBoundingClientRect().top;
-    const target =
-      pinDocTop - stuckTop + (index / Math.max(1, LAST_INDEX)) * range;
+      const target =
+        pinDocTop - stuckTop + (index / Math.max(1, LAST_INDEX)) * range;
 
-    ignoreScrollRef.current = true;
-    window.scrollTo({ top: target, behavior: "auto" });
-    window.setTimeout(() => {
-      ignoreScrollRef.current = false;
-    }, 80);
-  }, []);
+      ignoreScrollRef.current = true;
+      scrollToY(target);
+      window.setTimeout(() => {
+        ignoreScrollRef.current = false;
+      }, 120);
+    },
+    [scrollToY],
+  );
 
   const goTo = useCallback(
     (index: number) => {
@@ -239,20 +262,24 @@ export default function Projects() {
       const desktop = desktopQuery.matches;
       const travel = desktop
         ? window.innerHeight * 0.72
-        : window.innerHeight * 0.58;
+        : Math.max(window.innerHeight * 0.5, 320);
 
+      // Force layout read after height write.
       pin.style.height = `${sticky.offsetHeight + LAST_INDEX * travel}px`;
-      metricsRef.current.enabled = true;
-      metricsRef.current.stuckTop =
-        parseFloat(getComputedStyle(sticky).top) || 0;
-      metricsRef.current.range = Math.max(
-        0,
-        pin.offsetHeight - sticky.offsetHeight,
-      );
+      const stuckTop = parseFloat(getComputedStyle(sticky).top) || 0;
+      const pinDocTop = window.scrollY + pin.getBoundingClientRect().top;
+      const range = Math.max(0, pin.offsetHeight - sticky.offsetHeight);
+
+      metricsRef.current = {
+        enabled: range > 0,
+        stuckTop,
+        pinDocTop,
+        range,
+      };
     };
 
     const updateFromScroll = () => {
-      if (!metricsRef.current.enabled || dragRef.current?.dragging) return;
+      if (dragRef.current?.dragging || touchScrubRef.current?.active) return;
       if (
         ignoreScrollRef.current ||
         wheelLockRef.current ||
@@ -261,11 +288,12 @@ export default function Projects() {
         return;
       }
 
-      const { range, stuckTop } = metricsRef.current;
-      if (range <= 0) return;
+      const { range, stuckTop, pinDocTop, enabled } = metricsRef.current;
+      if (!enabled || range <= 0) return;
 
-      const pinTop = pin.getBoundingClientRect().top;
-      const progress = clamp((stuckTop - pinTop) / range, 0, 1);
+      // scrollY-based progress is more stable on iOS than live rect math.
+      const start = pinDocTop - stuckTop;
+      const progress = clamp((window.scrollY - start) / range, 0, 1);
       paintVisual(progress * LAST_INDEX);
     };
 
@@ -284,18 +312,152 @@ export default function Projects() {
 
     measure();
     updateFromScroll();
+
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onResize);
     desktopQuery.addEventListener("change", onResize);
+    window.visualViewport?.addEventListener("resize", onResize);
+    window.visualViewport?.addEventListener("scroll", onScroll);
+
+    const resizeObserver = new ResizeObserver(() => onResize());
+    resizeObserver.observe(pin);
+    resizeObserver.observe(sticky);
 
     return () => {
       if (scrollFrameRef.current) cancelAnimationFrame(scrollFrameRef.current);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onResize);
       desktopQuery.removeEventListener("change", onResize);
+      window.visualViewport?.removeEventListener("resize", onResize);
+      window.visualViewport?.removeEventListener("scroll", onScroll);
+      resizeObserver.disconnect();
       pin.style.height = "";
     };
   }, [paintVisual]);
+
+  // Mobile touch: vertical scrub through the pin, horizontal swipe between cards.
+  useEffect(() => {
+    const node = coverflowRef.current;
+    if (!node) return;
+
+    const pinBounds = () => {
+      const { enabled, range, stuckTop, pinDocTop } = metricsRef.current;
+      if (!enabled || range <= 0) return null;
+      const start = pinDocTop - stuckTop;
+      return { start, end: start + range, range };
+    };
+
+    const onTouchStart = (event: TouchEvent) => {
+      if (event.touches.length !== 1) return;
+      const touch = event.touches[0];
+      touchScrubRef.current = {
+        startX: touch.clientX,
+        startY: touch.clientY,
+        startScroll: window.scrollY,
+        origin: visualRef.current,
+        axis: null,
+        active: false,
+        passThrough: false,
+      };
+    };
+
+    const onTouchMove = (event: TouchEvent) => {
+      const scrub = touchScrubRef.current;
+      if (!scrub || event.touches.length !== 1) return;
+
+      const touch = event.touches[0];
+      const dx = touch.clientX - scrub.startX;
+      const dy = scrub.startY - touch.clientY;
+      const absX = Math.abs(dx);
+      const absY = Math.abs(touch.clientY - scrub.startY);
+
+      if (!scrub.axis) {
+        if (absX < 8 && absY < 8) return;
+
+        if (absX > absY) {
+          scrub.axis = "x";
+          scrub.active = true;
+          cancelAnimation();
+        } else {
+          const bounds = pinBounds();
+          const y = window.scrollY;
+          const inPin =
+            !!bounds && y >= bounds.start - 64 && y <= bounds.end + 64;
+          scrub.axis = "y";
+          scrub.active = true;
+          if (!inPin || !bounds) {
+            scrub.passThrough = true;
+          } else {
+            cancelAnimation();
+          }
+        }
+      }
+
+      if (!scrub.active || !scrub.axis) return;
+      event.preventDefault();
+
+      if (scrub.axis === "x") {
+        paintVisual(scrub.origin - dx / 260, false);
+        return;
+      }
+
+      if (scrub.passThrough) {
+        scrollToY(scrub.startScroll + dy);
+        return;
+      }
+
+      const bounds = pinBounds();
+      if (!bounds) return;
+
+      const nextScroll = clamp(
+        scrub.startScroll + dy,
+        bounds.start,
+        bounds.end,
+      );
+      ignoreScrollRef.current = true;
+      scrollToY(nextScroll);
+      paintVisual(((nextScroll - bounds.start) / bounds.range) * LAST_INDEX);
+
+      window.clearTimeout(touchIgnoreTimerRef.current);
+      touchIgnoreTimerRef.current = window.setTimeout(() => {
+        ignoreScrollRef.current = false;
+      }, 50);
+    };
+
+    const onTouchEnd = () => {
+      const scrub = touchScrubRef.current;
+      touchScrubRef.current = null;
+      ignoreScrollRef.current = false;
+      window.clearTimeout(touchIgnoreTimerRef.current);
+      if (!scrub?.active) return;
+      if (scrub.passThrough) return;
+
+      if (scrub.axis === "x") {
+        const delta = visualRef.current - scrub.origin;
+        if (Math.abs(delta) > 0.22) {
+          goTo(clamp(Math.round(scrub.origin + Math.sign(delta)), 0, LAST_INDEX));
+        } else {
+          goTo(Math.round(scrub.origin));
+        }
+        return;
+      }
+
+      goTo(clamp(Math.round(visualRef.current), 0, LAST_INDEX));
+    };
+
+    node.addEventListener("touchstart", onTouchStart, { passive: true });
+    node.addEventListener("touchmove", onTouchMove, { passive: false });
+    node.addEventListener("touchend", onTouchEnd);
+    node.addEventListener("touchcancel", onTouchEnd);
+
+    return () => {
+      window.clearTimeout(touchIgnoreTimerRef.current);
+      node.removeEventListener("touchstart", onTouchStart);
+      node.removeEventListener("touchmove", onTouchMove);
+      node.removeEventListener("touchend", onTouchEnd);
+      node.removeEventListener("touchcancel", onTouchEnd);
+    };
+  }, [cancelAnimation, goTo, paintVisual, scrollToY]);
 
   // Trackpad / mouse wheel swipe over the coverflow.
   useEffect(() => {
@@ -349,6 +511,9 @@ export default function Projects() {
   useEffect(() => () => cancelAnimation(), [cancelAnimation]);
 
   const onPointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
+    // Touch is handled by the dedicated scrub listeners.
+    if (event.pointerType === "touch") return;
+
     dragRef.current = {
       pointerId: event.pointerId,
       startX: event.clientX,
@@ -368,7 +533,6 @@ export default function Projects() {
 
     if (!drag.axis) {
       if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
-      // Vertical wins → let page scroll drive the pin like desktop.
       if (Math.abs(dy) >= Math.abs(dx)) {
         drag.axis = "y";
         return;

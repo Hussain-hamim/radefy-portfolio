@@ -1,4 +1,5 @@
 import BookButton from "./components/BookButton";
+import HeroGradient from "./components/HeroGradient";
 import HeroIntro from "./components/HeroIntro";
 import HeroWordmark from "./components/HeroWordmark";
 import About from "./components/About";
@@ -18,7 +19,7 @@ export default function Home() {
       <SiteHeader />
 
       <section className="hero" aria-label="Hero">
-        <div className="hero-gradient" aria-hidden="true" />
+        <HeroGradient />
         <div className="hero-main">
           <HeroWordmark />
 
