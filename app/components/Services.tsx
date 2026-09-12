@@ -72,12 +72,15 @@ export default function Services() {
     setScrollDriven(true);
     section.classList.add("services--scroll");
 
+    const STEP_COOLDOWN_MS = 480;
+    const WHEEL_THRESHOLD = 40;
+
     const state = {
       inZone: false,
       animating: false,
-      gestureOpen: true,
+      lockedUntil: 0,
       touchY: 0,
-      idleTimer: 0 as number,
+      wheelAcc: 0,
     };
 
     const yForStep = (index: number) => {
@@ -98,6 +101,8 @@ export default function Services() {
     const animateToStep = (index: number) => {
       const next = Math.max(0, Math.min(STEP_COUNT - 1, index));
       state.animating = true;
+      state.wheelAcc = 0;
+      state.lockedUntil = performance.now() + STEP_COOLDOWN_MS;
       setStep(next);
 
       gsap.to(window, {
@@ -111,58 +116,80 @@ export default function Services() {
       });
     };
 
-    const releaseGestureLater = () => {
-      window.clearTimeout(state.idleTimer);
-      state.idleTimer = window.setTimeout(() => {
-        state.gestureOpen = true;
-      }, 280);
+    const normalizeWheelDelta = (event: WheelEvent) => {
+      let dy = event.deltaY;
+      let dx = event.deltaX;
+
+      // lines → pixels, pages → viewport
+      if (event.deltaMode === 1) {
+        dy *= 16;
+        dx *= 16;
+      } else if (event.deltaMode === 2) {
+        dy *= window.innerHeight;
+        dx *= window.innerWidth;
+      }
+
+      // Legacy wheel events (some built-in / OEM mice)
+      const legacy = event as WheelEvent & {
+        wheelDelta?: number;
+        wheelDeltaY?: number;
+      };
+      if (dy === 0 && dx === 0) {
+        if (typeof legacy.wheelDeltaY === "number") dy = -legacy.wheelDeltaY;
+        else if (typeof legacy.wheelDelta === "number") dy = -legacy.wheelDelta;
+      }
+
+      return Math.abs(dy) >= Math.abs(dx) ? dy : dx;
     };
 
-    const tryStep = (direction: 1 | -1) => {
-      if (!state.inZone || state.animating || !state.gestureOpen) return false;
-
-      const next = stepRef.current + direction;
-      if (next < 0 || next > STEP_COUNT - 1) return false;
-
-      state.gestureOpen = false;
-      releaseGestureLater();
-      animateToStep(next);
-      return true;
-    };
+    const isInZone = () =>
+      Boolean(state.inZone || triggerRef.current?.isActive);
 
     const onWheel = (event: WheelEvent) => {
-      if (!state.inZone) return;
+      if (!isInZone()) return;
 
-      const direction: 1 | -1 = event.deltaY > 0 ? 1 : -1;
+      const delta = normalizeWheelDelta(event);
+      if (delta === 0) return;
+
+      const direction: 1 | -1 = delta > 0 ? 1 : -1;
       const leavingUp = direction < 0 && stepRef.current <= 0;
       const leavingDown = direction > 0 && stepRef.current >= STEP_COUNT - 1;
 
-      // Only free the page scroll when exiting past the first/last step.
+      // Free the page only when exiting past the first/last step.
       if (leavingUp || leavingDown) {
         if (state.animating) event.preventDefault();
-        releaseGestureLater();
+        state.wheelAcc = 0;
         return;
       }
 
-      // Inside 01–05: always own the wheel so native scroll can't desync steps.
+      // Always own the wheel inside 01–05 — even tiny trackpad deltas.
+      // (Skipping preventDefault on small deltas was breaking built-in mice.)
       event.preventDefault();
-      if (state.animating || !state.gestureOpen) {
-        releaseGestureLater();
+      event.stopPropagation();
+
+      const now = performance.now();
+      if (state.animating || now < state.lockedUntil) {
+        state.wheelAcc = 0;
         return;
       }
 
-      state.gestureOpen = false;
-      releaseGestureLater();
-      animateToStep(stepRef.current + direction);
+      state.wheelAcc += delta;
+
+      if (Math.abs(state.wheelAcc) < WHEEL_THRESHOLD) return;
+
+      const stepDirection: 1 | -1 = state.wheelAcc > 0 ? 1 : -1;
+      state.wheelAcc = 0;
+      animateToStep(stepRef.current + stepDirection);
     };
 
     const onTouchStart = (event: TouchEvent) => {
       state.touchY = event.touches[0]?.clientY ?? 0;
-      state.gestureOpen = true;
+      state.lockedUntil = 0;
+      state.wheelAcc = 0;
     };
 
     const onTouchMove = (event: TouchEvent) => {
-      if (!state.inZone) return;
+      if (!isInZone()) return;
       const y = event.touches[0]?.clientY ?? 0;
       const delta = state.touchY - y;
       if (Math.abs(delta) < 42) return;
@@ -177,11 +204,9 @@ export default function Services() {
       }
 
       event.preventDefault();
-      if (state.animating || !state.gestureOpen) return;
+      if (state.animating || performance.now() < state.lockedUntil) return;
 
       state.touchY = y;
-      state.gestureOpen = false;
-      releaseGestureLater();
       animateToStep(stepRef.current + direction);
     };
 
@@ -194,22 +219,24 @@ export default function Services() {
       invalidateOnRefresh: true,
       onEnter: (self) => {
         state.inZone = true;
-        state.gestureOpen = false;
-        releaseGestureLater();
+        state.wheelAcc = 0;
+        state.lockedUntil = performance.now() + STEP_COOLDOWN_MS;
         setStep(stepFromProgress(self.progress));
       },
       onEnterBack: (self) => {
         state.inZone = true;
-        state.gestureOpen = false;
-        releaseGestureLater();
+        state.wheelAcc = 0;
+        state.lockedUntil = performance.now() + STEP_COOLDOWN_MS;
         setStep(stepFromProgress(self.progress));
       },
       onLeave: () => {
         state.inZone = false;
+        state.wheelAcc = 0;
         setStep(STEP_COUNT - 1);
       },
       onLeaveBack: () => {
         state.inZone = false;
+        state.wheelAcc = 0;
         setStep(0);
       },
     });
@@ -218,14 +245,16 @@ export default function Services() {
     state.inZone = trigger.isActive;
     if (trigger.isActive) setStep(stepFromProgress(trigger.progress));
 
-    window.addEventListener("wheel", onWheel, { passive: false });
+    // Capture on document so built-in mice still work no matter what
+    // element is under the cursor (Windows routes wheel to hover target).
+    const wheelOpts: AddEventListenerOptions = { passive: false, capture: true };
+    document.addEventListener("wheel", onWheel, wheelOpts);
     window.addEventListener("touchstart", onTouchStart, { passive: true });
     window.addEventListener("touchmove", onTouchMove, { passive: false });
     ScrollTrigger.refresh();
 
     return () => {
-      window.clearTimeout(state.idleTimer);
-      window.removeEventListener("wheel", onWheel);
+      document.removeEventListener("wheel", onWheel, wheelOpts);
       window.removeEventListener("touchstart", onTouchStart);
       window.removeEventListener("touchmove", onTouchMove);
       gsap.killTweensOf(window);
