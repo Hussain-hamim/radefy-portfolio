@@ -14,8 +14,8 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-brand: var(--brand);
-  --font-sans: var(--font-outfit);
-  --font-display: var(--font-saira);
+  --font-sans: var(--font-poppins);
+  --font-display: var(--font-atures);
 }
 
 * {
@@ -32,7 +32,7 @@ body {
   min-height: 100%;
   background: #fff;
   color: var(--foreground);
-  font-family: var(--font-outfit), sans-serif;
+  font-family: var(--font-poppins), sans-serif;
 }
 
 .sr-only {
@@ -297,7 +297,7 @@ body {
 
 .hero-wordmark {
   width: 100%;
-  height: clamp(7.5rem, 20svh, 12.5rem);
+  height: clamp(12.5rem, 34svh, 20rem);
   flex-shrink: 0;
   cursor: pointer;
 }
@@ -552,7 +552,7 @@ body {
 .projects-title {
   margin: 0;
   color: var(--navy);
-  font-family: var(--font-saira), sans-serif;
+  font-family: var(--font-atures), sans-serif;
   font-size: clamp(1.75rem, 5.5vw, 2.35rem);
   font-weight: 700;
   letter-spacing: -0.045em;
@@ -720,7 +720,7 @@ body {
 }
 
 .project-card-name {
-  font-family: var(--font-saira), sans-serif;
+  font-family: var(--font-atures), sans-serif;
   font-size: 1.28rem;
   font-weight: 700;
   letter-spacing: -0.045em;
@@ -1105,7 +1105,7 @@ body {
 .team-stat-value {
   margin: 0;
   color: var(--brand);
-  font-family: var(--font-saira), sans-serif;
+  font-family: var(--font-atures), sans-serif;
   font-size: clamp(2.8rem, 6vw, 3.9rem);
   font-weight: 700;
   letter-spacing: -0.04em;
@@ -1158,7 +1158,7 @@ body {
 .team-people-title {
   margin: 0;
   color: var(--navy);
-  font-family: var(--font-saira), sans-serif;
+  font-family: var(--font-atures), sans-serif;
   font-size: clamp(2rem, 5vw, 3.25rem);
   font-weight: 700;
   letter-spacing: -0.045em;
@@ -1265,58 +1265,9 @@ body {
   background: #fff;
 }
 
-.services--scroll .services-sticky {
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  height: calc(100vh - 64px);
-  min-height: calc(100vh - 64px);
-  max-height: calc(100vh - 64px);
-  padding-top: 2rem;
-  padding-bottom: 1.5rem;
-  overflow: hidden;
-}
-
-.services--scroll .services-header {
-  flex-shrink: 0;
-  margin-bottom: 1.25rem;
-}
-
-.services--scroll .services-list-viewport {
-  flex: 1 1 auto;
-  min-height: 0;
-  width: 100%;
-  max-width: 1080px;
-  margin: 0 auto;
-  overflow: hidden;
-}
-
-.services--scroll .services-list {
-  will-change: transform;
-}
-
-.services--scroll .services-list-spacer {
-  /* Just enough room to lift later rows — not a huge empty gap */
-  height: 11rem;
-  pointer-events: none;
-}
-
-.services--scroll .services-note {
-  flex-shrink: 0;
-  margin-top: 1.25rem;
-}
-
 .services-header,
 .services-list,
-.services-list-viewport,
 .services-note {
-  width: 100%;
-  max-width: 1080px;
-  margin: 0 auto;
-}
-
-.services-list-viewport {
   width: 100%;
   max-width: 1080px;
   margin: 0 auto;
@@ -1339,7 +1290,7 @@ body {
 .services-title {
   margin: 0;
   color: var(--navy);
-  font-family: var(--font-saira), sans-serif;
+  font-family: var(--font-atures), sans-serif;
   font-size: clamp(3rem, 8vw, 5.6rem);
   font-weight: 700;
   letter-spacing: -0.05em;
@@ -1381,7 +1332,7 @@ body {
 }
 
 .service-title {
-  font-family: var(--font-saira), sans-serif;
+  font-family: var(--font-atures), sans-serif;
   font-size: clamp(1.2rem, 2.4vw, 1.7rem);
   font-weight: 700;
   letter-spacing: -0.03em;
@@ -1492,7 +1443,7 @@ body {
 .tools-title {
   margin: 0;
   color: var(--navy);
-  font-family: var(--font-saira), sans-serif;
+  font-family: var(--font-atures), sans-serif;
   font-size: clamp(2rem, 5vw, 3.25rem);
   font-weight: 700;
   letter-spacing: -0.045em;
@@ -1592,7 +1543,7 @@ body {
 .flow-title {
   margin: 0;
   color: var(--navy);
-  font-family: var(--font-saira), sans-serif;
+  font-family: var(--font-atures), sans-serif;
   font-size: clamp(3.4rem, 9vw, 6.4rem);
   font-weight: 700;
   letter-spacing: -0.055em;
@@ -1653,7 +1604,7 @@ body {
 .flow-step-title {
   margin: 0;
   color: #111;
-  font-family: var(--font-saira), sans-serif;
+  font-family: var(--font-atures), sans-serif;
   font-size: 1.05rem;
   font-weight: 700;
   letter-spacing: -0.02em;
@@ -1722,7 +1673,7 @@ body {
 .testimonials-title {
   margin: 0;
   color: #111;
-  font-family: var(--font-saira), sans-serif;
+  font-family: var(--font-atures), sans-serif;
   font-size: clamp(1.8rem, 3.5vw, 2.6rem);
   font-weight: 700;
   letter-spacing: -0.045em;
@@ -2087,7 +2038,7 @@ body {
   }
 
   .hero-wordmark {
-    height: clamp(9.5rem, 22svh, 14.5rem);
+    height: clamp(14.5rem, 38svh, 23rem);
   }
 
   .hero-copy {
@@ -2162,11 +2113,6 @@ body {
 
   .services-sticky {
     padding: 6.5rem 2.5rem 6rem;
-  }
-
-  .services--scroll .services-sticky {
-    padding-top: 3.5rem;
-    padding-bottom: 3.5rem;
   }
 
   .services-header {
@@ -2333,17 +2279,6 @@ body {
     opacity: 1 !important;
     transform: none !important;
     transition: none !important;
-  }
-
-  .services--scroll .services-sticky {
-    min-height: 0;
-    height: auto;
-    max-height: none;
-    overflow: visible;
-  }
-
-  .services--scroll .services-list {
-    transform: none !important;
   }
 
   .rolling-digit-track {
