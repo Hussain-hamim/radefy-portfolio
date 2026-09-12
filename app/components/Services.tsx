@@ -42,12 +42,13 @@ const SERVICES = [
 ] as const;
 
 const HEADER_OFFSET = 64;
-const STEP_COUNT = SERVICES.length;
+/** Only the first two services open on scroll; the rest stay closed for click. */
+const SCROLL_STEPS = 2;
 
 function stepFromProgress(progress: number) {
   return Math.min(
-    STEP_COUNT - 1,
-    Math.max(0, Math.round(progress * (STEP_COUNT - 1))),
+    SCROLL_STEPS - 1,
+    Math.max(0, Math.round(progress * (SCROLL_STEPS - 1))),
   );
 }
 
@@ -86,10 +87,10 @@ export default function Services() {
     const yForStep = (index: number) => {
       const trigger = triggerRef.current;
       if (!trigger) return window.scrollY;
-      if (STEP_COUNT <= 1) return trigger.start;
+      if (SCROLL_STEPS <= 1) return trigger.start;
       return (
         trigger.start +
-        (index / (STEP_COUNT - 1)) * (trigger.end - trigger.start)
+        (index / (SCROLL_STEPS - 1)) * (trigger.end - trigger.start)
       );
     };
 
@@ -99,7 +100,7 @@ export default function Services() {
     };
 
     const animateToStep = (index: number) => {
-      const next = Math.max(0, Math.min(STEP_COUNT - 1, index));
+      const next = Math.max(0, Math.min(SCROLL_STEPS - 1, index));
       state.animating = true;
       state.wheelAcc = 0;
       state.lockedUntil = performance.now() + STEP_COOLDOWN_MS;
@@ -153,16 +154,16 @@ export default function Services() {
 
       const direction: 1 | -1 = delta > 0 ? 1 : -1;
       const leavingUp = direction < 0 && stepRef.current <= 0;
-      const leavingDown = direction > 0 && stepRef.current >= STEP_COUNT - 1;
+      const leavingDown = direction > 0 && stepRef.current >= SCROLL_STEPS - 1;
 
-      // Free the page only when exiting past the first/last step.
+      // Free the page only when exiting past the first/last scroll step.
       if (leavingUp || leavingDown) {
         if (state.animating) event.preventDefault();
         state.wheelAcc = 0;
         return;
       }
 
-      // Always own the wheel inside 01–05 — even tiny trackpad deltas.
+      // Always own the wheel inside scroll steps — even tiny trackpad deltas.
       // (Skipping preventDefault on small deltas was breaking built-in mice.)
       event.preventDefault();
       event.stopPropagation();
@@ -196,7 +197,7 @@ export default function Services() {
 
       const direction: 1 | -1 = delta > 0 ? 1 : -1;
       const leavingUp = direction < 0 && stepRef.current <= 0;
-      const leavingDown = direction > 0 && stepRef.current >= STEP_COUNT - 1;
+      const leavingDown = direction > 0 && stepRef.current >= SCROLL_STEPS - 1;
 
       if (leavingUp || leavingDown) {
         if (state.animating) event.preventDefault();
@@ -214,7 +215,7 @@ export default function Services() {
       trigger: section,
       pin,
       start: `top top+=${HEADER_OFFSET}`,
-      end: () => `+=${(STEP_COUNT - 1) * window.innerHeight}`,
+      end: () => `+=${(SCROLL_STEPS - 1) * window.innerHeight}`,
       anticipatePin: 1,
       invalidateOnRefresh: true,
       onEnter: (self) => {
@@ -232,7 +233,7 @@ export default function Services() {
       onLeave: () => {
         state.inZone = false;
         state.wheelAcc = 0;
-        setStep(STEP_COUNT - 1);
+        setStep(SCROLL_STEPS - 1);
       },
       onLeaveBack: () => {
         state.inZone = false;
@@ -299,17 +300,25 @@ export default function Services() {
   }, []);
 
   const handleToggle = (index: number) => {
-    const trigger = triggerRef.current;
+    // Items beyond the scroll pair are click-only: open or close on demand.
+    if (index >= SCROLL_STEPS) {
+      setActive((prev) => (prev === index ? stepRef.current : index));
+      return;
+    }
+
     stepRef.current = index;
     setActive(index);
 
+    const trigger = triggerRef.current;
     if (!scrollDriven || !trigger) return;
 
     gsap.to(window, {
       scrollTo: {
         y:
-          trigger.start +
-          (index / (STEP_COUNT - 1)) * (trigger.end - trigger.start),
+          SCROLL_STEPS <= 1
+            ? trigger.start
+            : trigger.start +
+              (index / (SCROLL_STEPS - 1)) * (trigger.end - trigger.start),
         autoKill: false,
       },
       duration: 0.4,
