@@ -4,6 +4,7 @@ import Image from "next/image";
 import {
   useCallback,
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
   type PointerEvent as ReactPointerEvent,
@@ -61,23 +62,48 @@ const PROJECTS = [
   },
 ] as const;
 
-const SLIDE_DURATION_MS = 720;
+const SLIDE_DURATION_MS = 560;
+const LAST_INDEX = PROJECTS.length - 1;
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
 }
 
-function easeOutQuint(t: number) {
-  return 1 - Math.pow(1 - t, 5);
+function easeOutCubic(t: number) {
+  return 1 - Math.pow(1 - t, 3);
+}
+
+function paintSlide(el: HTMLElement, index: number, visual: number) {
+  const distance = index - visual;
+  const abs = Math.abs(distance);
+  const sign = distance === 0 ? 0 : distance > 0 ? 1 : -1;
+  const isCenter = abs < 0.45;
+
+  el.style.setProperty("--slide-x", `${distance * 44}vw`);
+  el.style.setProperty("--slide-z", `${-Math.min(abs, 3) * 140}px`);
+  el.style.setProperty(
+    "--slide-rotate",
+    `${-sign * Math.min(abs, 2.2) * 32}deg`,
+  );
+  el.style.setProperty(
+    "--slide-scale",
+    `${Math.max(0.66, 1 - abs * 0.2)}`,
+  );
+  el.style.setProperty(
+    "--slide-opacity",
+    `${abs > 1.55 ? 0 : Math.max(0.45, 1 - abs * 0.32)}`,
+  );
+  el.style.zIndex = `${Math.round(40 - abs * 8)}`;
+  el.style.pointerEvents = abs > 1.35 ? "none" : "auto";
+  el.classList.toggle("is-center", isCenter);
 }
 
 export default function Projects() {
   const pinRef = useRef<HTMLElement>(null);
   const stickyRef = useRef<HTMLDivElement>(null);
   const coverflowRef = useRef<HTMLDivElement>(null);
+  const slideRefs = useRef<(HTMLElement | null)[]>([]);
   const [active, setActive] = useState(0);
-  const [visual, setVisual] = useState(0);
-  const [dragging, setDragging] = useState(false);
   const activeRef = useRef(0);
   const visualRef = useRef(0);
   const ignoreScrollRef = useRef(false);
@@ -85,33 +111,35 @@ export default function Projects() {
   const wheelAccumRef = useRef(0);
   const animFrameRef = useRef(0);
   const animatingRef = useRef(false);
+  const scrollFrameRef = useRef(0);
+  const metricsRef = useRef({ range: 0, stuckTop: 0, enabled: false });
   const dragRef = useRef<{
+    pointerId: number;
     startX: number;
+    startY: number;
     origin: number;
+    axis: "x" | "y" | null;
     dragging: boolean;
   } | null>(null);
-  const lastIndex = PROJECTS.length - 1;
   const reduceMotionRef = useRef(false);
 
-  useEffect(() => {
-    activeRef.current = active;
-  }, [active]);
-
-  useEffect(() => {
-    const query = window.matchMedia("(prefers-reduced-motion: reduce)");
-    reduceMotionRef.current = query.matches;
-    const onChange = () => {
-      reduceMotionRef.current = query.matches;
-    };
-    query.addEventListener("change", onChange);
-    return () => query.removeEventListener("change", onChange);
-  }, []);
-
-  const setVisualImmediate = useCallback((value: number) => {
-    const next = clamp(value, 0, lastIndex);
+  const paintVisual = useCallback((value: number, syncActive = true) => {
+    const next = clamp(value, 0, LAST_INDEX);
     visualRef.current = next;
-    setVisual(next);
-  }, [lastIndex]);
+
+    const slides = slideRefs.current;
+    for (let i = 0; i < slides.length; i++) {
+      const el = slides[i];
+      if (el) paintSlide(el, i, next);
+    }
+
+    if (!syncActive) return;
+    const nextActive = Math.round(next);
+    if (nextActive !== activeRef.current) {
+      activeRef.current = nextActive;
+      setActive(nextActive);
+    }
+  }, []);
 
   const cancelAnimation = useCallback(() => {
     if (animFrameRef.current) {
@@ -123,11 +151,11 @@ export default function Projects() {
 
   const animateVisualTo = useCallback(
     (index: number) => {
-      const to = clamp(index, 0, lastIndex);
+      const to = clamp(index, 0, LAST_INDEX);
       cancelAnimation();
 
       if (reduceMotionRef.current || Math.abs(visualRef.current - to) < 0.001) {
-        setVisualImmediate(to);
+        paintVisual(to);
         return;
       }
 
@@ -137,7 +165,7 @@ export default function Projects() {
 
       const tick = (now: number) => {
         const t = Math.min(1, (now - start) / SLIDE_DURATION_MS);
-        setVisualImmediate(from + (to - from) * easeOutQuint(t));
+        paintVisual(from + (to - from) * easeOutCubic(t), t >= 1);
 
         if (t < 1) {
           animFrameRef.current = requestAnimationFrame(tick);
@@ -146,109 +174,128 @@ export default function Projects() {
 
         animFrameRef.current = 0;
         animatingRef.current = false;
-        setVisualImmediate(to);
+        paintVisual(to);
       };
 
       animFrameRef.current = requestAnimationFrame(tick);
     },
-    [cancelAnimation, lastIndex, setVisualImmediate],
+    [cancelAnimation, paintVisual],
   );
 
-  const syncScrollToIndex = useCallback(
-    (index: number) => {
-      const pin = pinRef.current;
-      const sticky = stickyRef.current;
-      if (!pin || !sticky) return;
-      if (!window.matchMedia("(min-width: 768px)").matches) return;
+  const syncScrollToIndex = useCallback((index: number) => {
+    const pin = pinRef.current;
+    const sticky = stickyRef.current;
+    const { enabled, range, stuckTop } = metricsRef.current;
+    if (!pin || !sticky || !enabled || range <= 0) return;
 
-      const range = pin.offsetHeight - sticky.offsetHeight;
-      if (range <= 0) return;
+    const pinDocTop = window.scrollY + pin.getBoundingClientRect().top;
+    const target =
+      pinDocTop - stuckTop + (index / Math.max(1, LAST_INDEX)) * range;
 
-      const stuckTop = parseFloat(getComputedStyle(sticky).top) || 0;
-      const pinDocTop = window.scrollY + pin.getBoundingClientRect().top;
-      const target =
-        pinDocTop - stuckTop + (index / Math.max(1, lastIndex)) * range;
-
-      ignoreScrollRef.current = true;
-      window.scrollTo({ top: target, behavior: "auto" });
-      window.setTimeout(() => {
-        ignoreScrollRef.current = false;
-      }, 100);
-    },
-    [lastIndex],
-  );
+    ignoreScrollRef.current = true;
+    window.scrollTo({ top: target, behavior: "auto" });
+    window.setTimeout(() => {
+      ignoreScrollRef.current = false;
+    }, 80);
+  }, []);
 
   const goTo = useCallback(
     (index: number) => {
-      const nextIndex = clamp(index, 0, lastIndex);
+      const nextIndex = clamp(index, 0, LAST_INDEX);
+      activeRef.current = nextIndex;
       setActive(nextIndex);
       animateVisualTo(nextIndex);
       syncScrollToIndex(nextIndex);
     },
-    [animateVisualTo, lastIndex, syncScrollToIndex],
+    [animateVisualTo, syncScrollToIndex],
   );
 
   const prev = useCallback(() => goTo(active - 1), [active, goTo]);
   const next = useCallback(() => goTo(active + 1), [active, goTo]);
 
-  // Desktop: page scroll through the pinned section drives the coverflow.
+  useEffect(() => {
+    const query = window.matchMedia("(prefers-reduced-motion: reduce)");
+    reduceMotionRef.current = query.matches;
+    const onChange = () => {
+      reduceMotionRef.current = query.matches;
+    };
+    query.addEventListener("change", onChange);
+    return () => query.removeEventListener("change", onChange);
+  }, []);
+
+  useLayoutEffect(() => {
+    paintVisual(visualRef.current, false);
+  }, [active, paintVisual]);
+
+  // Pin metrics + scroll-driven coverflow on all viewports.
   useEffect(() => {
     const pin = pinRef.current;
     const sticky = stickyRef.current;
     if (!pin || !sticky) return;
 
-    let frame = 0;
     const desktopQuery = window.matchMedia("(min-width: 768px)");
 
     const measure = () => {
-      if (!desktopQuery.matches) {
-        pin.style.height = "";
-        return;
-      }
-      pin.style.height = `${sticky.offsetHeight + lastIndex * window.innerHeight * 0.72}px`;
+      const desktop = desktopQuery.matches;
+      const travel = desktop
+        ? window.innerHeight * 0.72
+        : window.innerHeight * 0.58;
+
+      pin.style.height = `${sticky.offsetHeight + LAST_INDEX * travel}px`;
+      metricsRef.current.enabled = true;
+      metricsRef.current.stuckTop =
+        parseFloat(getComputedStyle(sticky).top) || 0;
+      metricsRef.current.range = Math.max(
+        0,
+        pin.offsetHeight - sticky.offsetHeight,
+      );
     };
 
-    const update = () => {
-      if (!desktopQuery.matches || dragRef.current?.dragging) return;
-      if (ignoreScrollRef.current || wheelLockRef.current || animatingRef.current) {
+    const updateFromScroll = () => {
+      if (!metricsRef.current.enabled || dragRef.current?.dragging) return;
+      if (
+        ignoreScrollRef.current ||
+        wheelLockRef.current ||
+        animatingRef.current
+      ) {
         return;
       }
 
-      const range = pin.offsetHeight - sticky.offsetHeight;
+      const { range, stuckTop } = metricsRef.current;
       if (range <= 0) return;
 
       const pinTop = pin.getBoundingClientRect().top;
-      const stuckTop = parseFloat(getComputedStyle(sticky).top) || 0;
       const progress = clamp((stuckTop - pinTop) / range, 0, 1);
-      const continuous = progress * lastIndex;
-      const nextActive = Math.round(continuous);
-
-      setVisualImmediate(continuous);
-      setActive((current) => (current === nextActive ? current : nextActive));
+      paintVisual(progress * LAST_INDEX);
     };
 
-    const onScrollOrResize = () => {
-      cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => {
-        measure();
-        update();
+    const onScroll = () => {
+      if (scrollFrameRef.current) return;
+      scrollFrameRef.current = requestAnimationFrame(() => {
+        scrollFrameRef.current = 0;
+        updateFromScroll();
       });
     };
 
+    const onResize = () => {
+      measure();
+      updateFromScroll();
+    };
+
     measure();
-    update();
-    window.addEventListener("scroll", onScrollOrResize, { passive: true });
-    window.addEventListener("resize", onScrollOrResize);
-    desktopQuery.addEventListener("change", onScrollOrResize);
+    updateFromScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onResize);
+    desktopQuery.addEventListener("change", onResize);
 
     return () => {
-      cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", onScrollOrResize);
-      window.removeEventListener("resize", onScrollOrResize);
-      desktopQuery.removeEventListener("change", onScrollOrResize);
+      if (scrollFrameRef.current) cancelAnimationFrame(scrollFrameRef.current);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onResize);
+      desktopQuery.removeEventListener("change", onResize);
       pin.style.height = "";
     };
-  }, [lastIndex, setVisualImmediate]);
+  }, [paintVisual]);
 
   // Trackpad / mouse wheel swipe over the coverflow.
   useEffect(() => {
@@ -262,11 +309,12 @@ export default function Projects() {
 
       if (!horizontal && absY < 8) return;
       if (!horizontal && absY >= absX && !event.shiftKey) {
+        if (!metricsRef.current.enabled) return;
         const sticky = stickyRef.current;
         if (!sticky) return;
         const rect = sticky.getBoundingClientRect();
-        const stuckTop = parseFloat(getComputedStyle(sticky).top) || 0;
-        const isPinned = Math.abs(rect.top - stuckTop) < 2;
+        const isPinned =
+          Math.abs(rect.top - metricsRef.current.stuckTop) < 2;
         if (!isPinned) return;
       }
 
@@ -281,7 +329,7 @@ export default function Projects() {
       wheelAccumRef.current += delta;
 
       if (wheelLockRef.current) return;
-      if (Math.abs(wheelAccumRef.current) < 28) return;
+      if (Math.abs(wheelAccumRef.current) < 36) return;
 
       const direction = wheelAccumRef.current > 0 ? 1 : -1;
       wheelAccumRef.current = 0;
@@ -291,7 +339,7 @@ export default function Projects() {
       window.setTimeout(() => {
         wheelLockRef.current = false;
         wheelAccumRef.current = 0;
-      }, SLIDE_DURATION_MS + 40);
+      }, SLIDE_DURATION_MS + 20);
     };
 
     node.addEventListener("wheel", onWheel, { passive: false });
@@ -301,33 +349,55 @@ export default function Projects() {
   useEffect(() => () => cancelAnimation(), [cancelAnimation]);
 
   const onPointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
-    cancelAnimation();
     dragRef.current = {
+      pointerId: event.pointerId,
       startX: event.clientX,
+      startY: event.clientY,
       origin: visualRef.current,
-      dragging: true,
+      axis: null,
+      dragging: false,
     };
-    setDragging(true);
-    event.currentTarget.setPointerCapture(event.pointerId);
   };
 
   const onPointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
     const drag = dragRef.current;
-    if (!drag?.dragging) return;
-    const delta = (event.clientX - drag.startX) / 280;
-    setVisualImmediate(drag.origin - delta);
+    if (!drag || drag.pointerId !== event.pointerId) return;
+
+    const dx = event.clientX - drag.startX;
+    const dy = event.clientY - drag.startY;
+
+    if (!drag.axis) {
+      if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
+      // Vertical wins → let page scroll drive the pin like desktop.
+      if (Math.abs(dy) >= Math.abs(dx)) {
+        drag.axis = "y";
+        return;
+      }
+      drag.axis = "x";
+      drag.dragging = true;
+      cancelAnimation();
+      coverflowRef.current?.classList.add("is-dragging");
+      event.currentTarget.setPointerCapture(event.pointerId);
+    }
+
+    if (drag.axis !== "x" || !drag.dragging) return;
+    paintVisual(drag.origin - dx / 280, false);
   };
 
   const onPointerUp = (event: ReactPointerEvent<HTMLDivElement>) => {
     const drag = dragRef.current;
-    if (!drag?.dragging) return;
+    if (!drag || drag.pointerId !== event.pointerId) return;
+
+    const wasDragging = drag.dragging;
     const delta = event.clientX - drag.startX;
-    drag.dragging = false;
+    const origin = drag.origin;
     dragRef.current = null;
-    setDragging(false);
+    coverflowRef.current?.classList.remove("is-dragging");
+
+    if (!wasDragging) return;
 
     if (Math.abs(delta) > 56) {
-      goTo(active + (delta < 0 ? 1 : -1));
+      goTo(Math.round(origin) + (delta < 0 ? 1 : -1));
     } else {
       goTo(Math.round(visualRef.current));
     }
@@ -349,7 +419,7 @@ export default function Projects() {
 
         <div className="projects-stage">
           <div
-            className={`projects-coverflow${dragging ? " is-dragging" : ""}`}
+            className="projects-coverflow"
             ref={coverflowRef}
             onPointerDown={onPointerDown}
             onPointerMove={onPointerMove}
@@ -357,25 +427,15 @@ export default function Projects() {
             onPointerCancel={onPointerUp}
           >
             {PROJECTS.map((project, index) => {
-              const distance = index - visual;
-              const abs = Math.abs(distance);
-              const sign = Math.sign(distance) || 0;
               const external = project.href.startsWith("http");
-              const isCenter = abs < 0.45;
+              const isCenter = index === active;
 
               return (
                 <article
                   key={project.name}
-                  className={`projects-slide${isCenter ? " is-center" : ""}`}
-                  style={{
-                    ["--slide-x" as string]: `${distance * 52}vw`,
-                    ["--slide-z" as string]: `${-Math.min(abs, 3) * 160}px`,
-                    ["--slide-rotate" as string]: `${-sign * Math.min(abs, 2.2) * 34}deg`,
-                    ["--slide-scale" as string]: `${Math.max(0.64, 1 - abs * 0.22)}`,
-                    ["--slide-opacity" as string]: `${abs > 1.55 ? 0 : Math.max(0.42, 1 - abs * 0.34)}`,
-                    ["--slide-blur" as string]: `${abs < 0.28 ? 0 : Math.min(abs * 1.1, 2.4)}px`,
-                    zIndex: Math.round(40 - abs * 8),
-                    pointerEvents: abs > 1.35 ? "none" : "auto",
+                  className="projects-slide"
+                  ref={(node) => {
+                    slideRefs.current[index] = node;
                   }}
                 >
                   <a
@@ -384,10 +444,9 @@ export default function Projects() {
                     tabIndex={isCenter ? 0 : -1}
                     aria-hidden={!isCenter}
                     onClick={(event) => {
-                      if (!isCenter) {
+                      if (Math.abs(index - visualRef.current) >= 0.45) {
                         event.preventDefault();
                         goTo(index);
-                        return;
                       }
                     }}
                     target={isCenter && external ? "_blank" : undefined}
@@ -401,6 +460,7 @@ export default function Projects() {
                         sizes="(max-width: 767px) 82vw, 520px"
                         className="project-card-image"
                         draggable={false}
+                        priority={index < 2}
                       />
                       <span className="project-card-shine" aria-hidden="true" />
                     </span>
@@ -463,7 +523,7 @@ export default function Projects() {
               className="projects-nav"
               aria-label="Next project"
               onClick={next}
-              disabled={active >= lastIndex}
+              disabled={active >= LAST_INDEX}
             >
               <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
                 <path
