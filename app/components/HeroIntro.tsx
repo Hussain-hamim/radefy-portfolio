@@ -13,11 +13,21 @@ export default function HeroIntro({
     const node = ref.current;
     if (!node) return;
 
-    const frame = window.requestAnimationFrame(() => {
-      node.classList.add("is-ready");
-    });
+    const hero = node.closest(".hero");
+    const reveal = () => node.classList.add("is-ready");
 
-    return () => window.cancelAnimationFrame(frame);
+    if (
+      !hero ||
+      hero.classList.contains("is-signature-complete") ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      const frame = window.requestAnimationFrame(reveal);
+      return () => window.cancelAnimationFrame(frame);
+    }
+
+    hero.addEventListener("radefy:signature-complete", reveal);
+    return () =>
+      hero.removeEventListener("radefy:signature-complete", reveal);
   }, []);
 
   return (

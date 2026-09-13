@@ -2,6 +2,7 @@ import BookButton from "./components/BookButton";
 import HeroGradient from "./components/HeroGradient";
 import HeroIntro from "./components/HeroIntro";
 import HeroWordmark from "./components/HeroWordmark";
+import RadefySignature from "./components/RadefySignature";
 import About from "./components/About";
 import Projects from "./components/Projects";
 import Services from "./components/Services";
@@ -20,6 +21,7 @@ export default function Home() {
 
       <section className="hero" aria-label="Hero">
         <HeroGradient />
+        <RadefySignature />
         <div className="hero-main">
           <HeroWordmark />
 
