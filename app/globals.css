@@ -171,8 +171,9 @@ body {
 .site-slogan {
   min-width: 0;
   color: var(--navy);
+  font-family: var(--font-atures), sans-serif;
   font-size: 0.78rem;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: -0.02em;
   line-height: 1.2;
   white-space: nowrap;
@@ -239,8 +240,9 @@ body {
 .site-menu a {
   padding: 0.55rem 0;
   color: var(--navy);
+  font-family: var(--font-atures), sans-serif;
   font-size: 0.95rem;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   text-decoration: none;
@@ -250,8 +252,9 @@ body {
   display: inline-block;
   overflow: hidden;
   color: var(--navy);
+  font-family: var(--font-atures), sans-serif;
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.08em;
   line-height: 1;
   text-transform: uppercase;
