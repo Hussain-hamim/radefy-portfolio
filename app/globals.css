@@ -69,6 +69,20 @@ body {
   transform: translate3d(0, 0, 0);
 }
 
+.hero:not(.is-signature-complete) .hero-wordmark {
+  opacity: 0;
+  transform: translate3d(0, 16px, 0);
+  pointer-events: none;
+}
+
+.hero.is-signature-complete .hero-wordmark {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  transition:
+    opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
 .hero-copy-text,
 .hero-actions {
   opacity: 0;
@@ -85,7 +99,8 @@ body {
 @media (scripting: none) {
   .reveal,
   .hero-copy-text,
-  .hero-actions {
+  .hero-actions,
+  .hero-wordmark {
     opacity: 1;
     transform: none;
   }
@@ -281,6 +296,74 @@ body {
       #6a4ef4 100%
     );
   background-size: 100% 100%;
+}
+
+.radefy-signature {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.radefy-signature.is-done {
+  visibility: hidden;
+}
+
+.radefy-signature-svg {
+  display: block;
+  width: min(48vw, 38vh, 15.5rem);
+  height: min(48vw, 38vh, 15.5rem);
+  overflow: visible;
+  color: var(--navy);
+  transform: translate3d(0, -4vh, 0);
+}
+
+.sig-vector,
+.sig-track,
+.sig-join,
+.sig-node,
+.sig-hook,
+.sig-leg,
+.sig-seed-g {
+  opacity: 0;
+}
+
+.sig-vector {
+  stroke: var(--brand);
+  stroke-width: 1.55;
+  stroke-linecap: butt;
+  stroke-linejoin: miter;
+}
+
+.sig-track {
+  stroke: rgb(35 33 75 / 0.48);
+  stroke-width: 1.2;
+  stroke-linecap: butt;
+  stroke-linejoin: miter;
+}
+
+.sig-join {
+  stroke: rgb(35 33 75 / 0.62);
+  stroke-width: 1.25;
+  stroke-linecap: butt;
+  stroke-linejoin: miter;
+}
+
+.sig-node {
+  transform-box: fill-box;
+  transform-origin: center;
+  fill: var(--navy);
+}
+
+.sig-hook,
+.sig-leg {
+  fill: currentColor;
+}
+
+.sig-seed {
+  fill: var(--brand);
 }
 
 .hero-main {
@@ -2028,6 +2111,14 @@ body {
   }
 }
 
+@media (min-width: 768px) {
+  .radefy-signature-svg {
+    width: min(36vw, 40vh, 18.5rem);
+    height: min(36vw, 40vh, 18.5rem);
+    transform: translate3d(0, -5vh, 0);
+  }
+}
+
 @media (min-width: 900px) {
   .site-header {
     position: fixed;
@@ -2329,10 +2420,15 @@ body {
   .reveal,
   .hero-copy-text,
   .hero-actions,
+  .hero-wordmark,
   .service-body-inner {
     opacity: 1 !important;
     transform: none !important;
     transition: none !important;
+  }
+
+  .radefy-signature {
+    display: none;
   }
 
   .services--scroll .services-sticky {
