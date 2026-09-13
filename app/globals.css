@@ -104,7 +104,9 @@ body {
   .team-people-title,
   .team-person-name,
   .team-person-role,
-  .team-index {
+  .team-index,
+  .service-title-text,
+  .service-number {
     opacity: 1;
     transform: none;
   }
@@ -1585,13 +1587,85 @@ body {
   letter-spacing: -0.02em;
 }
 
+.services-list {
+  position: relative;
+  padding-left: 1.35rem;
+}
+
+.services-spine {
+  position: absolute;
+  top: 1.75rem;
+  bottom: 1.25rem;
+  left: calc(0.675rem - 0.5px);
+  width: 1px;
+  background: rgb(35 33 75 / 0.16);
+  transform-origin: 50% 0;
+  pointer-events: none;
+}
+
 .service-item {
+  position: relative;
   border-bottom: 1px solid rgb(90 98 113 / 0.28);
+  transition: opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.services.is-ready .service-item:not(.is-open) {
+  opacity: 0.72;
+}
+
+.services.is-ready .service-item:not(.is-open):hover,
+.services.is-ready .service-item:not(.is-open):focus-within {
+  opacity: 1;
+}
+
+.service-item.is-open::after {
+  content: "";
+  position: absolute;
+  top: 2.35rem;
+  bottom: 0.65rem;
+  left: calc(-0.675rem - 0.75px);
+  width: 1.5px;
+  background: var(--brand);
+  transform-origin: 50% 0;
+  animation: service-path 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  pointer-events: none;
+}
+
+@keyframes service-path {
+  from {
+    transform: scaleY(0);
+  }
+
+  to {
+    transform: scaleY(1);
+  }
+}
+
+.service-node {
+  position: absolute;
+  top: 1.7rem;
+  left: calc(-0.675rem - 4.5px);
+  z-index: 2;
+  width: 9px;
+  height: 9px;
+  border: 1.15px solid rgb(35 33 75 / 0.4);
+  background: #fff;
+  transform: rotate(45deg);
+  transition:
+    background 0.35s ease,
+    border-color 0.35s ease;
+}
+
+.service-item.is-open .service-node,
+.service-item:hover .service-node,
+.service-item:focus-within .service-node {
+  background: var(--brand);
+  border-color: var(--brand);
 }
 
 .service-toggle {
   display: grid;
-  grid-template-columns: 2.5rem 1fr auto;
+  grid-template-columns: 4.4rem 1fr auto;
   align-items: center;
   gap: 0.75rem;
   width: 100%;
@@ -1603,13 +1677,37 @@ body {
   cursor: pointer;
 }
 
+.service-id {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.service-mark {
+  display: block;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.25;
+  color: rgb(35 33 75 / 0.42);
+  transition: color 0.35s ease;
+}
+
+.service-item.is-open .service-mark {
+  color: var(--brand);
+}
+
 .service-number {
   color: rgb(35 33 75 / 0.55);
   font-size: 0.9rem;
   font-weight: 600;
+  transition: color 0.35s ease;
 }
 
 .service-title {
+  overflow: hidden;
   font-family: var(--font-saira), sans-serif;
   font-size: clamp(1.2rem, 2.4vw, 1.7rem);
   font-weight: 700;
@@ -1617,16 +1715,25 @@ body {
   text-transform: uppercase;
 }
 
-.service-icon {
-  display: grid;
-  place-items: center;
-  color: var(--navy);
-  transition: transform 0.3s ease;
+.service-title-text {
+  display: block;
 }
 
-.service-item.is-open .service-icon {
+.service-dock {
+  width: 9px;
+  height: 9px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  color: rgb(35 33 75 / 0.45);
+  transform: rotate(-135deg);
+  transition:
+    transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    color 0.35s ease;
+}
+
+.service-item.is-open .service-dock {
   color: var(--brand);
-  transform: rotate(180deg);
+  transform: rotate(45deg);
 }
 
 .service-item.is-open .service-number {
@@ -2420,7 +2527,7 @@ body {
 
   .service-body-inner {
     display: grid;
-    grid-template-columns: 2.5rem minmax(0, 1fr) minmax(0, 1.1fr);
+    grid-template-columns: 4.4rem minmax(0, 1fr) minmax(0, 1.1fr);
     column-gap: 0.75rem;
   }
 
@@ -2572,10 +2679,29 @@ body {
   .hero-copy-text,
   .hero-actions,
   .hero-wordmark,
-  .service-body-inner {
+  .service-body-inner,
+  .service-title-text,
+  .service-number,
+  .service-mark,
+  .service-dock,
+  .service-node,
+  .services-spine {
     opacity: 1 !important;
     transform: none !important;
     transition: none !important;
+    animation: none !important;
+  }
+
+  .service-item,
+  .service-toggle,
+  .service-body {
+    clip-path: none !important;
+    opacity: 1 !important;
+  }
+
+  .service-item.is-open::after {
+    animation: none !important;
+    transform: none !important;
   }
 
   .radefy-signature {
