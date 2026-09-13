@@ -8,11 +8,12 @@ import {
 } from "../lib/fluid-shader";
 
 type HeroWordmarkProps = {
-  word?: string;
   className?: string;
 };
 
-const DEFAULT_WORD = "Radefy Systems";
+const BRAND = "Radefy";
+const SUBLINE = "Systems";
+const LABEL = `${BRAND} ${SUBLINE}`;
 
 function compile(
   gl: WebGL2RenderingContext,
@@ -93,7 +94,6 @@ function lerp(a: number, b: number, t: number) {
 }
 
 export default function HeroWordmark({
-  word = DEFAULT_WORD,
   className = "hero-wordmark",
 }: HeroWordmarkProps) {
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -134,23 +134,41 @@ export default function HeroWordmark({
     let targetX = 0.5;
     let targetY = 0.5;
 
-    const fontFamily =
-      getComputedStyle(document.documentElement)
-        .getPropertyValue("--font-saira")
-        .trim() || "Saira, sans-serif";
+    const rootStyle = getComputedStyle(document.documentElement);
+    const atures =
+      rootStyle.getPropertyValue("--font-atures").trim() || "Atures, sans-serif";
+    const poppins =
+      rootStyle.getPropertyValue("--font-poppins").trim() ||
+      "Poppins, sans-serif";
 
-    const fitFont = (width: number, height: number) => {
-      let size = height * 1.08;
-      ctx.letterSpacing = "-0.035em";
-      ctx.font = `800 ${size}px ${fontFamily}`;
-      if ("fontStretch" in ctx) {
-        (ctx as CanvasRenderingContext2D & { fontStretch?: string }).fontStretch =
-          "semi-condensed";
+    const fitStack = (width: number, height: number) => {
+      const gap = Math.max(2, height * 0.02);
+      let brandSize = height * 0.56;
+      let subSize = height * 0.5;
+
+      ctx.letterSpacing = "-0.045em";
+      ctx.font = `700 ${brandSize}px ${atures}`;
+      while (ctx.measureText(BRAND).width > width * 0.98 && brandSize > 16) {
+        brandSize *= 0.97;
+        ctx.font = `700 ${brandSize}px ${atures}`;
       }
-      while (ctx.measureText(word).width > width && size > 18) {
-        size *= 0.97;
-        ctx.font = `800 ${size}px ${fontFamily}`;
+
+      ctx.letterSpacing = "0.04em";
+      ctx.font = `700 ${subSize}px ${poppins}`;
+      while (ctx.measureText(SUBLINE).width > width * 0.98 && subSize > 11) {
+        subSize *= 0.97;
+        ctx.font = `700 ${subSize}px ${poppins}`;
       }
+
+      return { brandSize, subSize, gap };
+    };
+
+    const drawBoldText = (text: string, x: number, y: number, stroke: number) => {
+      ctx.lineJoin = "round";
+      ctx.miterLimit = 2;
+      ctx.lineWidth = stroke;
+      ctx.strokeText(text, x, y);
+      ctx.fillText(text, x, y);
     };
 
     const resize = () => {
@@ -266,10 +284,23 @@ export default function HeroWordmark({
 
       ctx.clearRect(0, 0, width, height);
       ctx.fillStyle = "#111";
+      ctx.strokeStyle = "#111";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      fitFont(width, height);
-      ctx.fillText(word, width / 2, height / 2 + height * 0.04);
+
+      const { brandSize, subSize, gap } = fitStack(width, height);
+      const stackHeight = brandSize + gap + subSize;
+      const brandY = (height - stackHeight) / 2 + brandSize / 2;
+      const subY = brandY + brandSize / 2 + gap + subSize / 2;
+
+      ctx.letterSpacing = "-0.045em";
+      ctx.font = `700 ${brandSize}px ${atures}`;
+      drawBoldText(BRAND, width / 2, brandY, Math.max(1.25, brandSize * 0.028));
+
+      ctx.letterSpacing = "0.04em";
+      ctx.font = `700 ${subSize}px ${poppins}`;
+      drawBoldText(SUBLINE, width / 2, subY, Math.max(1.1, subSize * 0.03));
+
       ctx.globalCompositeOperation = "source-in";
       ctx.drawImage(glCanvas, 0, 0, width, height);
       ctx.globalCompositeOperation = "source-over";
@@ -317,15 +348,15 @@ export default function HeroWordmark({
       wrap.removeEventListener("pointerleave", onLeave);
       wrap.removeEventListener("pointermove", onMove);
     };
-  }, [word]);
+  }, []);
 
   return (
     <div className={className} ref={wrapRef}>
       <canvas ref={canvasRef} draggable={false} aria-hidden="true" />
       {className === "hero-wordmark" ? (
-        <h1 className="sr-only">{word}</h1>
+        <h1 className="sr-only">{LABEL}</h1>
       ) : (
-        <p className="sr-only">{word}</p>
+        <p className="sr-only">{LABEL}</p>
       )}
     </div>
   );

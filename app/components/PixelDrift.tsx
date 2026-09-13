@@ -188,8 +188,8 @@ export default function PixelDrift({
 
     const palette = colors.length > 0 ? colors : DEFAULTS.colors;
     const fontFamily =
-      getComputedStyle(document.body).getPropertyValue("--font-saira").trim() ||
-      "Saira, system-ui, sans-serif";
+      getComputedStyle(document.body).getPropertyValue("--font-atures").trim() ||
+      "Atures, system-ui, sans-serif";
     const fontStack = `${fontFamily}, system-ui, -apple-system, "Segoe UI", sans-serif`;
 
     let count = 0;

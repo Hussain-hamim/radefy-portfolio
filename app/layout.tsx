@@ -1,17 +1,19 @@
 import type { Metadata } from "next";
-import { Outfit, Saira } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 
-const outfit = Outfit({
-  variable: "--font-outfit",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+const poppins = localFont({
+  src: "../public/fonts/Poppins-Medium.ttf",
+  variable: "--font-poppins",
+  weight: "500",
+  display: "swap",
 });
 
-const saira = Saira({
-  variable: "--font-saira",
-  subsets: ["latin"],
-  axes: ["wdth"],
+const atures = localFont({
+  src: "../public/fonts/Atures-700_PERSONAL_USE.ttf",
+  variable: "--font-atures",
+  weight: "700",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -28,7 +30,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${outfit.variable} ${saira.variable} h-full antialiased`}
+      className={`${poppins.variable} ${atures.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
