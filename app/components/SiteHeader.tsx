@@ -18,7 +18,13 @@ export default function SiteHeader() {
       <div className="site-header-bar">
         <a className="site-brand" href="#top" aria-label="Radefy Systems">
           <RadefyLogo className="site-logo" />
-          <span className="site-slogan">Radefy Systems</span>
+          <span className="site-wordmark" aria-hidden="true">
+            <span className="site-wordmark-name">Radefy</span>
+            <span className="site-wordmark-meta">
+              <span>Systems</span>
+              <span className="site-wordmark-rule" />
+            </span>
+          </span>
         </a>
 
         <nav className="site-nav-desktop" aria-label="Main navigation">

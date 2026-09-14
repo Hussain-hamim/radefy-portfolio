@@ -26,7 +26,7 @@ const PEOPLE = [
   {
     name: "Rahmat Danish",
     role: "DevOps Engineer",
-    image: "/team/rahmat-danish.png",
+    image: "/team/rahmat-danish-v2.png",
     x: "https://x.com/",
     linkedin: "https://www.linkedin.com/",
   },
