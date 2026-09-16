@@ -127,7 +127,23 @@ html.is-signature-playing body {
 html.is-signature-playing .site-header {
   opacity: 0;
   pointer-events: none;
-  transform: translate3d(0, -12px, 0);
+}
+
+html.is-signature-playing.is-signature-handoff .site-header {
+  opacity: 1;
+}
+
+html.is-signature-playing.is-signature-handoff .site-brand {
+  visibility: hidden;
+}
+
+html.is-signature-playing.is-signature-handoff .hero {
+  isolation: auto;
+  overflow: visible;
+}
+
+html.is-signature-playing.is-signature-handoff .radefy-signature {
+  z-index: 31;
 }
 
 html.is-signature-playing .hero {

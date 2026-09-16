@@ -27,7 +27,7 @@ const SIGNATURE = {
   resolve: 0.58,
   lock: 0.68,
   hold: 0.42,
-  yield: 0.72,
+  flight: 1.05,
 } as const;
 
 function prepStroke(el: SVGGeometryElement) {
@@ -40,6 +40,13 @@ function prepStroke(el: SVGGeometryElement) {
 
 function setIntroLock(locked: boolean) {
   document.documentElement.classList.toggle("is-signature-playing", locked);
+  if (!locked) {
+    document.documentElement.classList.remove("is-signature-handoff");
+  }
+}
+
+function setIntroHandoff(active: boolean) {
+  document.documentElement.classList.toggle("is-signature-handoff", active);
 }
 
 function completeHero(hero: Element) {
@@ -68,6 +75,7 @@ export default function RadefySignature() {
       Array.from(root.querySelectorAll(sel)) as T[];
 
     const stage = q<SVGGElement>(".sig-stage");
+    const signatureSvg = q<SVGSVGElement>(".radefy-signature-svg");
     const seed = q<SVGGElement>(".sig-seed-g");
     const vector = q<SVGPathElement>(".sig-vector");
     const tracks = qa<SVGPathElement>(".sig-track");
@@ -77,8 +85,23 @@ export default function RadefySignature() {
     const leg = q<SVGPathElement>(".sig-leg");
     const wordmark = q<HTMLElement>(".sig-wordmark");
     const rule = q<HTMLElement>(".sig-wordmark-rule");
+    const targetLogo = document.querySelector<SVGSVGElement>(".site-header .site-logo");
+    const targetWordmark = document.querySelector<HTMLElement>(
+      ".site-header .site-wordmark",
+    );
 
-    if (!stage || !seed || !vector || !hook || !leg || !wordmark || !rule) {
+    if (
+      !stage ||
+      !signatureSvg ||
+      !seed ||
+      !vector ||
+      !hook ||
+      !leg ||
+      !wordmark ||
+      !rule ||
+      !targetLogo ||
+      !targetWordmark
+    ) {
       completeHero(hero);
       return;
     }
@@ -88,8 +111,8 @@ export default function RadefySignature() {
       if (disposed) return;
       disposed = true;
       window.clearTimeout(safety);
-      root.classList.add("is-done");
       completeHero(hero);
+      root.classList.add("is-done");
     };
 
     const safety = window.setTimeout(finish, 5500);
@@ -123,6 +146,7 @@ export default function RadefySignature() {
       gsap.set(hook, { opacity: 0, x: -6 });
       gsap.set(leg, { opacity: 0, x: 18, y: 18 });
       gsap.set(stage, { transformOrigin: "50% 50%" });
+      gsap.set(signatureSvg, { transformOrigin: "50% 50%" });
       gsap.set(wordmark, { opacity: 0, y: 22 });
       gsap.set(rule, { scaleX: 0, transformOrigin: "left center" });
 
@@ -228,17 +252,67 @@ export default function RadefySignature() {
         )
         .to(seed, { opacity: 0, duration: 0.32 }, "resolve+=0.62");
 
-      // Stage 6 — hold the resolved mark, then yield to the existing hero.
-      tl.addLabel("yield", `+=${SIGNATURE.hold}`)
-        .to(stage, {
-          opacity: 0,
-          scale: 0.94,
-          duration: SIGNATURE.yield,
-        })
+      // Stage 6 — the loader becomes the permanent header lockup.
+      let logoFlight = { x: 0, y: 0, scale: 1 };
+      let wordmarkFlight = { x: 0, y: 0, scale: 1 };
+      const measureFlight = () => {
+        const logoFrom = signatureSvg.getBoundingClientRect();
+        const logoTo = targetLogo.getBoundingClientRect();
+        const wordmarkFrom = wordmark.getBoundingClientRect();
+        const wordmarkTo = targetWordmark.getBoundingClientRect();
+
+        logoFlight = {
+          x: logoTo.left + logoTo.width / 2 - (logoFrom.left + logoFrom.width / 2),
+          y: logoTo.top + logoTo.height / 2 - (logoFrom.top + logoFrom.height / 2),
+          scale: logoTo.width / Math.max(logoFrom.width, 1),
+        };
+        wordmarkFlight = {
+          x:
+            wordmarkTo.left +
+            wordmarkTo.width / 2 -
+            (wordmarkFrom.left + wordmarkFrom.width / 2),
+          y:
+            wordmarkTo.top +
+            wordmarkTo.height / 2 -
+            (wordmarkFrom.top + wordmarkFrom.height / 2),
+          scale: wordmarkTo.width / Math.max(wordmarkFrom.width, 1),
+        };
+      };
+
+      tl.addLabel("handoff", `+=${SIGNATURE.hold}`)
+        .call(measureFlight, [], "handoff")
+        .call(() => setIntroHandoff(true), [], "handoff")
+        .to(
+          signatureSvg,
+          { x: 6, y: -8, scale: 1.035, duration: 0.14, ease: "power2.out" },
+          "handoff",
+        )
         .to(
           wordmark,
-          { opacity: 0, y: -10, duration: SIGNATURE.yield * 0.72 },
-          "yield",
+          { x: 5, y: -7, scale: 1.025, duration: 0.14, ease: "power2.out" },
+          "handoff+=0.06",
+        )
+        .to(
+          signatureSvg,
+          {
+            x: () => logoFlight.x,
+            y: () => logoFlight.y,
+            scale: () => logoFlight.scale,
+            duration: SIGNATURE.flight,
+            ease: "power4.inOut",
+          },
+          "handoff+=0.14",
+        )
+        .to(
+          wordmark,
+          {
+            x: () => wordmarkFlight.x,
+            y: () => wordmarkFlight.y,
+            scale: () => wordmarkFlight.scale,
+            duration: SIGNATURE.flight * 0.94,
+            ease: "power4.inOut",
+          },
+          "handoff+=0.2",
         );
 
     }, root);
