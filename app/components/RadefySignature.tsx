@@ -38,7 +38,12 @@ function prepStroke(el: SVGGeometryElement) {
   });
 }
 
+function setIntroLock(locked: boolean) {
+  document.documentElement.classList.toggle("is-signature-playing", locked);
+}
+
 function completeHero(hero: Element) {
+  setIntroLock(false);
   hero.classList.remove("is-signature-playing");
   hero.classList.add("is-signature-complete");
   hero.dispatchEvent(new Event(SIGNATURE_EVENT));
@@ -70,8 +75,10 @@ export default function RadefySignature() {
     const nodes = qa<SVGRectElement>(".sig-node");
     const hook = q<SVGPathElement>(".sig-hook");
     const leg = q<SVGPathElement>(".sig-leg");
+    const wordmark = q<HTMLElement>(".sig-wordmark");
+    const rule = q<HTMLElement>(".sig-wordmark-rule");
 
-    if (!stage || !seed || !vector || !hook || !leg) {
+    if (!stage || !seed || !vector || !hook || !leg || !wordmark || !rule) {
       completeHero(hero);
       return;
     }
@@ -85,7 +92,7 @@ export default function RadefySignature() {
       completeHero(hero);
     };
 
-    const safety = window.setTimeout(finish, 8000);
+    const safety = window.setTimeout(finish, 5500);
 
     const ctx = gsap.context(() => {
       if (reduceMotion) {
@@ -94,6 +101,7 @@ export default function RadefySignature() {
       }
 
       hero.classList.add("is-signature-playing");
+      setIntroLock(true);
 
       prepStroke(vector);
       tracks.forEach(prepStroke);
@@ -115,11 +123,13 @@ export default function RadefySignature() {
       gsap.set(hook, { opacity: 0, x: -6 });
       gsap.set(leg, { opacity: 0, x: 18, y: 18 });
       gsap.set(stage, { transformOrigin: "50% 50%" });
+      gsap.set(wordmark, { opacity: 0, y: 22 });
+      gsap.set(rule, { scaleX: 0, transformOrigin: "left center" });
 
       const tl = gsap.timeline({
         defaults: { ease: SIGNATURE.ease },
         onComplete: finish,
-        timeScale: compact ? 1.14 : 1,
+        timeScale: compact ? 1.55 : 1.4,
       });
 
       // Stage 1 — only the aperture-shaped seed. An idea, not the logo.
@@ -161,6 +171,17 @@ export default function RadefySignature() {
           `paths+=${index * SIGNATURE.trackStagger}`,
         );
       });
+
+      // Bring the name in while the mark is still being constructed.
+      tl.to(
+        wordmark,
+        { opacity: 1, y: 0, duration: 0.7 },
+        "paths+=0.12",
+      ).to(
+        rule,
+        { scaleX: 1, duration: 0.5 },
+        "paths+=0.3",
+      );
 
       // Stage 4 — intersections snap. Complexity becomes a measured system.
       tl.addLabel("structure", ">-0.36");
@@ -208,17 +229,25 @@ export default function RadefySignature() {
         .to(seed, { opacity: 0, duration: 0.32 }, "resolve+=0.62");
 
       // Stage 6 — hold the resolved mark, then yield to the existing hero.
-      tl.addLabel("yield", `+=${SIGNATURE.hold}`).to(stage, {
-        opacity: 0,
-        scale: 0.94,
-        duration: SIGNATURE.yield,
-      });
+      tl.addLabel("yield", `+=${SIGNATURE.hold}`)
+        .to(stage, {
+          opacity: 0,
+          scale: 0.94,
+          duration: SIGNATURE.yield,
+        })
+        .to(
+          wordmark,
+          { opacity: 0, y: -10, duration: SIGNATURE.yield * 0.72 },
+          "yield",
+        );
+
     }, root);
 
     return () => {
       disposed = true;
       window.clearTimeout(safety);
       ctx.revert();
+      setIntroLock(false);
       hero.classList.remove("is-signature-playing");
     };
   }, []);
@@ -275,6 +304,13 @@ export default function RadefySignature() {
           </g>
         </g>
       </svg>
+      <p className="sig-wordmark" aria-hidden="true">
+        <span className="site-wordmark-name">Radefy</span>
+        <span className="site-wordmark-meta">
+          <span>Systems</span>
+          <span className="site-wordmark-rule sig-wordmark-rule" />
+        </span>
+      </p>
     </div>
   );
 }
