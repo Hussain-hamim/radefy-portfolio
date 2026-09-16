@@ -146,8 +146,21 @@ export default function RadefySignature() {
       gsap.set(hook, { opacity: 0, x: -6 });
       gsap.set(leg, { opacity: 0, x: 18, y: 18 });
       gsap.set(stage, { transformOrigin: "50% 50%" });
-      gsap.set(signatureSvg, { transformOrigin: "50% 50%" });
-      gsap.set(wordmark, { opacity: 0, y: 22 });
+      gsap.set(signatureSvg, {
+        x: 0,
+        y: 0,
+        scale: 1,
+        force3D: true,
+        transformOrigin: "50% 50%",
+      });
+      gsap.set(wordmark, {
+        opacity: 0,
+        x: 0,
+        y: 22,
+        scale: compact ? 1.7 : 2.5,
+        force3D: true,
+        transformOrigin: "50% 50%",
+      });
       gsap.set(rule, { scaleX: 0, transformOrigin: "left center" });
 
       const tl = gsap.timeline({
@@ -256,7 +269,7 @@ export default function RadefySignature() {
       let logoFlight = { x: 0, y: 0, scale: 1 };
       let wordmarkFlight = { x: 0, y: 0, scale: 1 };
       const measureFlight = () => {
-        const logoFrom = signatureSvg.getBoundingClientRect();
+        const logoFrom = hook.getBoundingClientRect();
         const logoTo = targetLogo.getBoundingClientRect();
         const wordmarkFrom = wordmark.getBoundingClientRect();
         const wordmarkTo = targetWordmark.getBoundingClientRect();
@@ -275,23 +288,13 @@ export default function RadefySignature() {
             wordmarkTo.top +
             wordmarkTo.height / 2 -
             (wordmarkFrom.top + wordmarkFrom.height / 2),
-          scale: wordmarkTo.width / Math.max(wordmarkFrom.width, 1),
+          scale: 1,
         };
       };
 
       tl.addLabel("handoff", `+=${SIGNATURE.hold}`)
         .call(measureFlight, [], "handoff")
         .call(() => setIntroHandoff(true), [], "handoff")
-        .to(
-          signatureSvg,
-          { x: 6, y: -8, scale: 1.035, duration: 0.14, ease: "power2.out" },
-          "handoff",
-        )
-        .to(
-          wordmark,
-          { x: 5, y: -7, scale: 1.025, duration: 0.14, ease: "power2.out" },
-          "handoff+=0.06",
-        )
         .to(
           signatureSvg,
           {
@@ -301,7 +304,7 @@ export default function RadefySignature() {
             duration: SIGNATURE.flight,
             ease: "power4.inOut",
           },
-          "handoff+=0.14",
+          "handoff",
         )
         .to(
           wordmark,
@@ -312,7 +315,7 @@ export default function RadefySignature() {
             duration: SIGNATURE.flight * 0.94,
             ease: "power4.inOut",
           },
-          "handoff+=0.2",
+          "handoff+=0.06",
         );
 
     }, root);
