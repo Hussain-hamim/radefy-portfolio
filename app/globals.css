@@ -1168,6 +1168,15 @@ html.is-signature-playing .hero-main {
   background: #fff;
 }
 
+.about-title {
+  max-width: 1520px;
+  margin: 0 auto 2.5rem;
+  color: var(--navy);
+  font-family: var(--font-atures), sans-serif;
+  font-size: clamp(2.5rem, 5vw, 4.5rem);
+  line-height: 1.1;
+}
+
 .about-inner,
 .about-brands {
   width: 100%;

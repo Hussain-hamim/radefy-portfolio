@@ -1,4 +1,5 @@
 import ScrollReveal from "./ScrollReveal";
+import ScrollHighlight from "./ScrollHighlight";
 
 const SYSTEMS = [
   "Schools & academies",
@@ -33,27 +34,17 @@ const ICON_PATHS = [
 
 export default function About() {
   return (
-    <section className="about" id="about">
-      <ScrollReveal as="div" className="about-inner">
+    <section className="about" id="about" aria-labelledby="about-title">
+      <h2 className="about-title" id="about-title">About us</h2>
+      <div className="about-inner">
         <p className="about-label">Who we are</p>
-        <p className="about-copy">
-          Radefy Systems is an independent software company based in Khost,
-          Afghanistan. We work directly with businesses
-          to turn operational challenges into dependable software. We combine
-          hands-on engineering with AI-assisted development to move projects
-          forward efficiently.
-        </p>
-      </ScrollReveal>
+        <ScrollHighlight text="Radefy Systems is an independent software company based in Khost, Afghanistan. We work directly with businesses to turn operational challenges into dependable software. We combine hands-on engineering with AI-assisted development to move projects forward efficiently." />
+      </div>
 
-      <ScrollReveal as="div" className="about-inner">
+      <div className="about-inner">
         <p className="about-label">Our ambition</p>
-        <p className="about-copy">
-          Alongside client projects, we build and continue to develop our own
-          consumer applications. Our ambition is to grow this product portfolio
-          and build larger software platforms that support businesses and
-          everyday life across Afghanistan and beyond.
-        </p>
-      </ScrollReveal>
+        <ScrollHighlight text="Alongside client projects, we build and continue to develop our own consumer applications. Our ambition is to grow this product portfolio and build larger software platforms that support businesses and everyday life across Afghanistan and beyond." />
+      </div>
 
       <div className="about-brands">
         <ScrollReveal>
