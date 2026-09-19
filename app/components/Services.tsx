@@ -8,38 +8,38 @@ import ServiceModule from "./ServiceModule";
 const SERVICES = [
   {
     number: "01",
-    title: "Brand identity",
+    title: "Custom software",
     kind: "brand",
-    points: ["Logo and wordmark", "Visual system", "Brand guidelines"],
-    copy: "We craft B2B brand identities with a clear point of view, built to scale across every touchpoint.",
+    points: ["Business systems", "Client portals", "Internal tools"],
+    copy: "Bring your operations into one connected system. We develop business applications that help your team manage information, coordinate work, and reduce repetitive tasks.",
   },
   {
     number: "02",
-    title: "Web design",
+    title: "AI & automation",
     kind: "design",
-    points: ["UX and wireframes", "Visual design", "Design system"],
-    copy: "We design websites that look sharp and convert, from first wireframe to final pixel.",
+    points: ["Workflow automation", "AI integration", "Connected systems"],
+    copy: "Put automation to work in your everyday operations. We connect your tools and integrate AI into defined workflows, with human oversight where decisions matter.",
   },
   {
     number: "03",
-    title: "Web engineering",
+    title: "Web platforms",
     kind: "engineering",
-    points: ["Multi-CMS architecture", "Technical SEO and speed", "Built to scale"],
-    copy: "We engineer large-scale sites: multi-CMS setups, clean technical SEO, and fast, maintainable architecture that holds up as you grow.",
+    points: ["Web applications", "Company websites", "APIs and databases"],
+    copy: "Give customers and teams a better way to interact with your business. We build responsive websites, portals, and web applications with the infrastructure to support them.",
   },
   {
     number: "04",
-    title: "Growth",
+    title: "App development",
     kind: "growth",
-    points: ["SEO foundations", "Landing pages", "Content systems"],
-    copy: "We help the brand and site grow with SEO, landing pages, and content your team can run.",
+    points: ["Mobile apps", "Desktop apps", "Cross-platform products"],
+    copy: "Make your services accessible wherever people work. We develop mobile and desktop applications with clear interfaces and consistent experiences across devices.",
   },
   {
     number: "05",
-    title: "Strategy",
+    title: "Product engineering",
     kind: "strategy",
-    points: ["Positioning", "Messaging", "Roadmap"],
-    copy: "We sharpen positioning and messaging so the brand says the right thing to the right buyer.",
+    points: ["Product discovery", "MVP development", "Long-term improvement"],
+    copy: "Take your product from concept to release. We help define the scope, develop an initial version, and plan improvements around feedback from the people using it.",
   },
 ] as const;
 
@@ -160,7 +160,8 @@ export default function Services() {
             <h2 className="services-title">Services</h2>
           </div>
           <p className="services-lede">
-            Brand, web, and the infrastructure behind it, handled end to end.
+            From daily operations to your next product launch, we build the
+            software your business needs.
           </p>
         </ScrollReveal>
 
@@ -178,8 +179,8 @@ export default function Services() {
         </div>
 
         <ScrollReveal as="p" className="services-note" delay={120}>
-          Need something more specific? Tell us and we will scope it.{" "}
-          <a href="#book">Book a call</a>
+          Let’s define the right approach for your project.{" "}
+          <a href="#book">Discuss your requirements</a>
         </ScrollReveal>
       </div>
     </section>

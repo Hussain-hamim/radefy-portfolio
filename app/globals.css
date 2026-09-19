@@ -987,6 +987,42 @@ html.is-signature-playing .hero-main {
   cursor: default;
 }
 
+.projects-skip {
+  appearance: none;
+  position: absolute;
+  right: 1.25rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid rgb(35 33 75 / 0.14);
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.9);
+  color: rgb(35 33 75 / 0.72);
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    color 0.25s ease,
+    border-color 0.25s ease,
+    background 0.25s ease;
+}
+
+.projects-skip:hover {
+  border-color: rgb(106 78 244 / 0.35);
+  background: rgb(106 78 244 / 0.07);
+  color: var(--brand);
+}
+
+.projects-skip:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 3px;
+}
+
 .projects-dots {
   display: flex;
   align-items: center;
@@ -1013,6 +1049,14 @@ html.is-signature-playing .hero-main {
 }
 
 @media (max-width: 520px) {
+  .projects-skip span {
+    display: none;
+  }
+
+  .projects-skip {
+    padding: 0.6rem;
+  }
+
   .project-card-body {
     grid-template-columns: 1fr;
     gap: 0.75rem;
@@ -1217,6 +1261,24 @@ html.is-signature-playing .hero-main {
   font-weight: 600;
   letter-spacing: -0.03em;
   line-height: 1;
+}
+
+.about-industry {
+  flex-direction: column;
+  gap: 0.85rem;
+  color: var(--navy);
+  text-align: center;
+}
+
+.about-industry .about-brand-mark {
+  width: 30px;
+  height: 30px;
+  color: var(--brand);
+}
+
+.about-industry .about-brand-name {
+  font-size: clamp(0.85rem, 1.5vw, 1.05rem);
+  line-height: 1.4;
 }
 
 .about-brand-kyzenn .about-brand-name {
@@ -2157,15 +2219,6 @@ html.is-signature-playing .hero-main {
   flex-shrink: 0;
   overflow: hidden;
   border-radius: 18px;
-  background: #ececec;
-}
-
-.testimonials-photo-image {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  filter: grayscale(1);
 }
 
 .testimonials-quote p {
@@ -2336,6 +2389,13 @@ html.is-signature-playing .hero-main {
   font-weight: 600;
   letter-spacing: -0.02em;
   text-decoration: none;
+}
+
+.footer-location {
+  color: rgb(35 33 75 / 0.72);
+  font-size: 0.92rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
 }
 
 .footer-slide {

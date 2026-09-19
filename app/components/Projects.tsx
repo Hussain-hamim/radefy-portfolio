@@ -13,52 +13,36 @@ import ScrollReveal from "./ScrollReveal";
 
 const PROJECTS = [
   {
+    name: "IdeaHunt",
+    category: "AI / Startup Research",
+    focus: "AI Research",
+    detail: "AI-powered research to discover and validate startup ideas",
+    href: "https://www.ideahunt.pro/",
+    image: "/projects/Screenshot 2026-09-19 at 12.47.06 PM.png",
+  },
+  {
     name: "Radefy English Academy",
     category: "Education / Academy Management",
     focus: "Education",
-    detail: "Ops dashboard for enrollments, fees, and growth",
+    detail: "Academy software for enrollments, fees, classes, and reporting",
     href: "https://course-rad-sys.vercel.app/",
     image: "/projects/radefy-english-academy.png",
   },
   {
-    name: "Kyzenn",
-    category: "Amazon Growth / eCommerce",
-    focus: "eCommerce",
-    detail: "Brand and product systems built to convert",
-    href: "#projects",
-    image: "/projects/kyzenn.jpg",
+    name: "Afghan Sarafi Management System",
+    category: "Finance / Sarafi Management",
+    focus: "Sarafi",
+    detail: "Multi-currency cash, exchanges, hawala, and customer accounts",
+    href: "/projects/file_0000000016b08246b946997f66b02d34.png",
+    image: "/projects/file_0000000016b08246b946997f66b02d34.png",
   },
   {
-    name: "SenseHawk",
-    category: "Climate Tech / Enterprise SaaS",
-    focus: "Climate SaaS",
-    detail: "Enterprise web for field and climate ops",
-    href: "#projects",
-    image: "/projects/sensehawk.jpg",
-  },
-  {
-    name: "Fluxora",
-    category: "Payments / POS Solutions",
-    focus: "Payments",
-    detail: "Clear product story for POS and checkout",
-    href: "#projects",
-    image: "/projects/fluxora.jpg",
-  },
-  {
-    name: "Finite",
-    category: "Fintech / Brand Platform",
-    focus: "Fintech",
-    detail: "Identity and site for a sharper finance brand",
-    href: "#projects",
-    image: "/projects/finite.jpg",
-  },
-  {
-    name: "Northline CRM",
-    category: "B2B SaaS / Sales Ops",
-    focus: "B2B SaaS",
-    detail: "Product UI and marketing site for pipeline teams",
-    href: "#projects",
-    image: "/projects/sensehawk.jpg",
+    name: "BBL Business Management",
+    category: "ERP / Business Operations",
+    focus: "Business ERP",
+    detail: "Sales, inventory, cash, and reporting in one business dashboard",
+    href: "/projects/Image 9-19-26 at 12.31 PM (1).jpg",
+    image: "/projects/Image 9-19-26 at 12.31 PM (1).jpg",
   },
 ] as const;
 
@@ -104,10 +88,13 @@ export default function Projects() {
   const coverflowRef = useRef<HTMLDivElement>(null);
   const slideRefs = useRef<(HTMLElement | null)[]>([]);
   const [active, setActive] = useState(0);
+  const [skipDirection, setSkipDirection] = useState<"up" | "down">("down");
   const activeRef = useRef(0);
   const visualRef = useRef(0);
+  const lastScrollYRef = useRef(0);
   const ignoreScrollRef = useRef(false);
   const wheelLockRef = useRef(false);
+  const wheelDirectionRef = useRef(0);
   const wheelAccumRef = useRef(0);
   const animFrameRef = useRef(0);
   const animatingRef = useRef(false);
@@ -170,25 +157,40 @@ export default function Projects() {
       animFrameRef.current = 0;
     }
     animatingRef.current = false;
+    ignoreScrollRef.current = false;
   }, []);
 
-  const animateVisualTo = useCallback(
+  const animateToIndex = useCallback(
     (index: number) => {
       const to = clamp(index, 0, LAST_INDEX);
       cancelAnimation();
 
+      const { enabled, range, stuckTop, pinDocTop } = metricsRef.current;
+      const canSyncScroll = enabled && range > 0;
+      const targetScroll = canSyncScroll
+        ? pinDocTop - stuckTop + (to / Math.max(1, LAST_INDEX)) * range
+        : window.scrollY;
+
       if (reduceMotionRef.current || Math.abs(visualRef.current - to) < 0.001) {
         paintVisual(to);
+        if (canSyncScroll) scrollToY(targetScroll);
         return;
       }
 
-      const from = visualRef.current;
+      const fromVisual = visualRef.current;
+      const fromScroll = window.scrollY;
       const start = performance.now();
       animatingRef.current = true;
+      ignoreScrollRef.current = true;
 
       const tick = (now: number) => {
         const t = Math.min(1, (now - start) / SLIDE_DURATION_MS);
-        paintVisual(from + (to - from) * easeOutCubic(t), t >= 1);
+        const eased = easeOutCubic(t);
+
+        paintVisual(fromVisual + (to - fromVisual) * eased, t >= 1);
+        if (canSyncScroll) {
+          scrollToY(fromScroll + (targetScroll - fromScroll) * eased);
+        }
 
         if (t < 1) {
           animFrameRef.current = requestAnimationFrame(tick);
@@ -197,29 +199,14 @@ export default function Projects() {
 
         animFrameRef.current = 0;
         animatingRef.current = false;
+        ignoreScrollRef.current = false;
         paintVisual(to);
+        if (canSyncScroll) scrollToY(targetScroll);
       };
 
       animFrameRef.current = requestAnimationFrame(tick);
     },
-    [cancelAnimation, paintVisual],
-  );
-
-  const syncScrollToIndex = useCallback(
-    (index: number) => {
-      const { enabled, range, stuckTop, pinDocTop } = metricsRef.current;
-      if (!enabled || range <= 0) return;
-
-      const target =
-        pinDocTop - stuckTop + (index / Math.max(1, LAST_INDEX)) * range;
-
-      ignoreScrollRef.current = true;
-      scrollToY(target);
-      window.setTimeout(() => {
-        ignoreScrollRef.current = false;
-      }, 120);
-    },
-    [scrollToY],
+    [cancelAnimation, paintVisual, scrollToY],
   );
 
   const goTo = useCallback(
@@ -227,14 +214,35 @@ export default function Projects() {
       const nextIndex = clamp(index, 0, LAST_INDEX);
       activeRef.current = nextIndex;
       setActive(nextIndex);
-      animateVisualTo(nextIndex);
-      syncScrollToIndex(nextIndex);
+      animateToIndex(nextIndex);
     },
-    [animateVisualTo, syncScrollToIndex],
+    [animateToIndex],
   );
 
   const prev = useCallback(() => goTo(active - 1), [active, goTo]);
   const next = useCallback(() => goTo(active + 1), [active, goTo]);
+  const skipProjects = useCallback(() => {
+    const pin = pinRef.current;
+    if (!pin) return;
+
+    cancelAnimation();
+
+    const destination =
+      skipDirection === "up"
+        ? pin.previousElementSibling
+        : pin.nextElementSibling;
+    const target = destination
+      ? window.scrollY + destination.getBoundingClientRect().top
+      : skipDirection === "up"
+        ? window.scrollY + pin.getBoundingClientRect().top
+        : window.scrollY + pin.getBoundingClientRect().bottom;
+
+    window.scrollTo({
+      top: target,
+      left: 0,
+      behavior: reduceMotionRef.current ? "auto" : "smooth",
+    });
+  }, [cancelAnimation, skipDirection]);
 
   useEffect(() => {
     const query = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -298,6 +306,17 @@ export default function Projects() {
     };
 
     const onScroll = () => {
+      const currentScrollY = window.scrollY;
+      const delta = currentScrollY - lastScrollYRef.current;
+      lastScrollYRef.current = currentScrollY;
+
+      if (Math.abs(delta) > 1) {
+        const nextDirection = delta < 0 ? "up" : "down";
+        setSkipDirection((current) =>
+          current === nextDirection ? current : nextDirection,
+        );
+      }
+
       if (scrollFrameRef.current) return;
       scrollFrameRef.current = requestAnimationFrame(() => {
         scrollFrameRef.current = 0;
@@ -310,6 +329,7 @@ export default function Projects() {
       updateFromScroll();
     };
 
+    lastScrollYRef.current = window.scrollY;
     measure();
     updateFromScroll();
 
@@ -480,13 +500,38 @@ export default function Projects() {
         if (!isPinned) return;
       }
 
-      event.preventDefault();
-
       const delta = horizontal
         ? event.deltaX
         : event.shiftKey
           ? event.deltaY
           : event.deltaY;
+
+      // At either end, release vertical scrolling back to the page instead of
+      // trapping the wheel inside the carousel.
+      if (!horizontal) {
+        const leavingUp = delta < 0 && visualRef.current <= 0.05;
+        const leavingDown = delta > 0 && visualRef.current >= LAST_INDEX - 0.05;
+
+        if (leavingUp || leavingDown) {
+          cancelAnimation();
+          wheelLockRef.current = false;
+          wheelDirectionRef.current = 0;
+          wheelAccumRef.current = 0;
+          return;
+        }
+      }
+
+      const incomingDirection = delta > 0 ? 1 : -1;
+      if (
+        wheelLockRef.current &&
+        incomingDirection !== wheelDirectionRef.current
+      ) {
+        cancelAnimation();
+        wheelLockRef.current = false;
+        wheelAccumRef.current = 0;
+      }
+
+      event.preventDefault();
 
       wheelAccumRef.current += delta;
 
@@ -496,17 +541,19 @@ export default function Projects() {
       const direction = wheelAccumRef.current > 0 ? 1 : -1;
       wheelAccumRef.current = 0;
       wheelLockRef.current = true;
+      wheelDirectionRef.current = direction;
       goTo(activeRef.current + direction);
 
       window.setTimeout(() => {
         wheelLockRef.current = false;
+        wheelDirectionRef.current = 0;
         wheelAccumRef.current = 0;
       }, SLIDE_DURATION_MS + 20);
     };
 
     node.addEventListener("wheel", onWheel, { passive: false });
     return () => node.removeEventListener("wheel", onWheel);
-  }, [goTo]);
+  }, [cancelAnimation, goTo]);
 
   useEffect(() => () => cancelAnimation(), [cancelAnimation]);
 
@@ -575,10 +622,10 @@ export default function Projects() {
             <h2 className="projects-title">Projects</h2>
           </div>
           <p className="projects-lede">
-            Case studies that show how brand, web, and growth come together for
-            B2B teams.
+            A selection of our work across business systems and digital
+            products.
           </p>
-          <p className="projects-hint">Swipe or scroll — the center piece comes forward.</p>
+          <p className="projects-hint">Scroll or swipe to explore our work.</p>
         </ScrollReveal>
 
         <div className="projects-stage">
@@ -613,13 +660,13 @@ export default function Projects() {
                         goTo(index);
                       }
                     }}
-                    target={isCenter && external ? "_blank" : undefined}
-                    rel={isCenter && external ? "noopener noreferrer" : undefined}
+                    target={isCenter ? "_blank" : undefined}
+                    rel={isCenter ? "noopener noreferrer" : undefined}
                   >
                     <span className="project-card-media">
                       <Image
                         src={project.image}
-                        alt={`${project.name} website`}
+                        alt={`${project.name} application dashboard`}
                         fill
                         sizes="(max-width: 767px) 82vw, 520px"
                         className="project-card-image"
@@ -636,7 +683,7 @@ export default function Projects() {
                       <span className="project-card-aside">
                         <span className="project-card-tag">{project.category}</span>
                         <span className="project-card-cta">
-                          View project
+                          {external ? "View project" : "View preview"}
                           <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
                             <path
                               fill="currentColor"
@@ -693,6 +740,24 @@ export default function Projects() {
                 <path
                   fill="currentColor"
                   d="M5.8 3.2 10.6 8 5.8 12.8l1.2 1.2L13 8l-6-6-1.2 1.2Z"
+                />
+              </svg>
+            </button>
+
+            <button
+              type="button"
+              className="projects-skip"
+              onClick={skipProjects}
+            >
+              <span>{skipDirection === "up" ? "Back to hero" : "Skip projects"}</span>
+              <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true">
+                <path
+                  fill="currentColor"
+                  d={
+                    skipDirection === "up"
+                      ? "m3.2 10.2 4.8-4.8 4.8 4.8L14 9l-6-6-6 6 1.2 1.2Z"
+                      : "m3.2 5.8 4.8 4.8 4.8-4.8L14 7l-6 6-6-6 1.2-1.2Z"
+                  }
                 />
               </svg>
             </button>

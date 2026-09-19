@@ -6,7 +6,7 @@ import ScrollReveal from "./ScrollReveal";
 
 const LINKS = [
   { label: "Services", href: "#services" },
-  { label: "Workflow", href: "#workflow" },
+  { label: "How we build", href: "#workflow" },
   { label: "Projects", href: "#projects" },
   { label: "Testimonials", href: "#testimonials" },
 ] as const;
@@ -40,15 +40,15 @@ export default function SiteFooter() {
             <span className="footer-brand-copy">
               <span className="footer-brand-name">Radefy Systems</span>
               <span className="footer-brand-tag">
-                defying the status quo
+                Software for what comes next.
               </span>
             </span>
           </a>
 
           <div className="footer-cta" id="book">
-            <p>Ready to start?</p>
+            <p>Let’s discuss your next project.</p>
             <SlideLink href="mailto:hello@radefysystems.com">
-              Book a discovery call
+              Start a conversation
             </SlideLink>
           </div>
         </ScrollReveal>
@@ -59,7 +59,7 @@ export default function SiteFooter() {
             <SlideLink href="mailto:hello@radefysystems.com">
               hello@radefysystems.com
             </SlideLink>
-            <a href="mailto:hello@radefysystems.com">New projects welcome</a>
+            <span className="footer-location">Based in Khost, Afghanistan</span>
           </div>
 
           <div className="footer-col">

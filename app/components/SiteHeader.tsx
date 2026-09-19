@@ -6,7 +6,7 @@ import RadefyLogo from "./RadefyLogo";
 const LINKS = [
   { label: "Projects", href: "#projects" },
   { label: "Services", href: "#services" },
-  { label: "Solutions", href: "#workflow" },
+  { label: "How we build", href: "#workflow" },
   { label: "Contact", href: "#contact" },
 ] as const;
 

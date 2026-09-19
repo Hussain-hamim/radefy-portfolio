@@ -1,70 +1,35 @@
 import ScrollReveal from "./ScrollReveal";
 
-const BRANDS = [
-  {
-    name: "Finite",
-    style: "finite",
-    mark: (
-      <svg viewBox="0 0 20 20" aria-hidden="true">
-        <path
-          fill="currentColor"
-          d="M10 1.2 18 5.8v8.4L10 18.8 2 14.2V5.8L10 1.2Zm0 3.4L5.6 7.2v5.6L10 15.4l4.4-2.6V7.2L10 4.6Z"
-        />
-      </svg>
-    ),
-  },
-  {
-    name: "Kyzenn",
-    style: "kyzenn",
-    mark: null,
-  },
-  {
-    name: "SenseHawk",
-    style: "sensehawk",
-    mark: (
-      <svg viewBox="0 0 22 16" aria-hidden="true">
-        <path
-          fill="currentColor"
-          d="M1 10.2c4.2-6 10.2-9 16.8-9.6-4 2.6-6.6 6.8-7 11.6 5-4 11.2-5.6 17.4-4.6-6.6 3-11.2 8.8-12.4 15.6"
-          transform="scale(0.72) translate(-1 -1)"
-        />
-      </svg>
-    ),
-  },
-  {
-    name: "Fluxora",
-    style: "fluxora",
-    mark: (
-      <svg viewBox="0 0 18 18" aria-hidden="true">
-        <path
-          fill="currentColor"
-          d="M9 1a8 8 0 1 1 0 16A8 8 0 0 1 9 1Zm4.2 6.2-2.4 2.2H5.4V8h4.2L8.4 6.8 9.6 5.6l3.6 3.2-3.6 3.2-1.2-1.2 1.2-1.2"
-        />
-      </svg>
-    ),
-  },
-  {
-    name: "Cardo",
-    style: "cardo",
-    mark: (
-      <svg viewBox="0 0 20 16" aria-hidden="true">
-        <path fill="currentColor" d="M10 1 18 14H2L10 1Zm0 4.4L6.4 12h7.2L10 5.4Z" />
-      </svg>
-    ),
-  },
-  {
-    name: "DealDesk",
-    style: "dealdesk",
-    mark: (
-      <svg viewBox="0 0 18 18" aria-hidden="true">
-        <path
-          fill="currentColor"
-          d="M3 3h5.2v2.2H5.2v7.6H3V3Zm6.8 0H15v2.2h-3v2.2h2.6V9.6H12v2.2h3V15H9.8V3Z"
-        />
-      </svg>
-    ),
-  },
-] as const;
+const SYSTEMS = [
+  "Schools & academies",
+  "Sarafi & exchange",
+  "Clinics & healthcare",
+  "Gyms & fitness",
+  "Airlines & travel",
+  "Government organizations",
+  "Tailoring businesses",
+  "Retail & inventory",
+  "ERP & MIS systems",
+  "Consumer apps",
+  "Mobile apps",
+  "Desktop applications",
+];
+
+// Consistent line icons for each sector, in the same order as SYSTEMS.
+const ICON_PATHS = [
+  "M3 9l9-5 9 5-9 5-9-5Zm4 3v5c3 2 7 2 10 0v-5M21 9v7",
+  "M4 7h15l-4-4M20 17H5l4 4M4 7v5M20 17v-5M9 12h6",
+  "M9 3h6v6h6v6h-6v6H9v-6H3V9h6V3Z",
+  "M7 9h10M7 15h10M3 9v6M6 6v12M18 6v12M21 9v6",
+  "m3 10 7 1 5-7c1-2 4-2 3 1l-3 7 5 5-2 2-6-3-4 4-2-1 2-5-5-2v-2Z",
+  "m3 8 9-5 9 5H3ZM5 11v7M10 11v7M14 11v7M19 11v7M3 21h18",
+  "M9 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm0 10a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM8 10l12 10M8 16 20 4",
+  "m3 7 9-4 9 4-9 4-9-4Zm0 0v10l9 4 9-4V7M12 11v10M7 5l10 4",
+  "M3 3h7v7H3V3ZM14 14h7v7h-7v-7ZM14 3h7v7h-7V3ZM3 14h7v7H3v-7Z",
+  "M15 7a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM5 21v-3a7 7 0 0 1 14 0v3M9 17h6",
+  "M7 2h10a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2ZM10 5h4M11 19h2",
+  "M4 3h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2ZM8 21h8M12 17v4M2 13h20",
+];
 
 export default function About() {
   return (
@@ -72,30 +37,44 @@ export default function About() {
       <ScrollReveal as="div" className="about-inner">
         <p className="about-label">Who we are</p>
         <p className="about-copy">
-          The people who scope your brand and architecture are the same people
-          who design, build, and ship it, then stay on to help you grow. No
-          account managers, no junior handoffs.
+          Radefy Systems is an independent software company based in Khost,
+          Afghanistan. We work directly with businesses
+          to turn operational challenges into dependable software. We combine
+          hands-on engineering with AI-assisted development to move projects
+          forward efficiently.
+        </p>
+      </ScrollReveal>
+
+      <ScrollReveal as="div" className="about-inner">
+        <p className="about-label">Our ambition</p>
+        <p className="about-copy">
+          Alongside client projects, we build and continue to develop our own
+          consumer applications. Our ambition is to grow this product portfolio
+          and build larger software platforms that support businesses and
+          everyday life across Afghanistan and beyond.
         </p>
       </ScrollReveal>
 
       <div className="about-brands">
         <ScrollReveal>
           <p className="about-brands-label">
-            Some of the brands we collaborate with
+            Software for businesses, organizations, and everyday life
           </p>
         </ScrollReveal>
         <ul className="about-brands-list">
-          {BRANDS.map((brand, index) => (
+          {SYSTEMS.map((name, index) => (
             <ScrollReveal
-              key={brand.name}
+              key={name}
               as="li"
-              className={`about-brand about-brand-${brand.style}`}
+              className="about-brand about-industry"
               delay={index * 60}
             >
-              {brand.mark ? (
-                <span className="about-brand-mark">{brand.mark}</span>
-              ) : null}
-              <span className="about-brand-name">{brand.name}</span>
+              <span className="about-brand-mark">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d={ICON_PATHS[index]} />
+                </svg>
+              </span>
+              <span className="about-brand-name">{name}</span>
             </ScrollReveal>
           ))}
         </ul>

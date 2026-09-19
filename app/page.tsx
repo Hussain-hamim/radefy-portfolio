@@ -15,8 +15,37 @@ import Testimonials from "./components/Testimonials";
 import SiteFooter from "./components/SiteFooter";
 
 export default function Home() {
+  const organizationJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "Radefy Systems",
+    url: "https://www.radefysystems.com/",
+    logo: "https://www.radefysystems.com/logo.png",
+    email: "hello@radefysystems.com",
+    description:
+      "A software company in Khost, Afghanistan building custom software, AI-powered systems, web platforms, and apps for businesses.",
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: "Khost",
+      addressCountry: "AF",
+    },
+    knowsAbout: [
+      "Custom software development",
+      "Artificial intelligence",
+      "Web application development",
+      "Mobile application development",
+      "Business automation",
+    ],
+  };
+
   return (
     <main id="top">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(organizationJsonLd).replace(/</g, "\\u003c"),
+        }}
+      />
       <SiteHeader />
 
       <section className="hero" aria-label="Hero">
@@ -27,9 +56,9 @@ export default function Home() {
 
           <HeroIntro>
             <p className="hero-copy-text">
-              A senior B2B brand and web studio. We design brands and the
-              websites that carry them, built to the standard of the best work
-              on the web, then help both grow.
+              Software that moves your business forward. We develop custom
+              systems, web platforms, and applications that simplify operations
+              and bring new products to market.
             </p>
 
             <div className="hero-actions">

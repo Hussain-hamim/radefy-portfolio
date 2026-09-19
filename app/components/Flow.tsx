@@ -4,23 +4,23 @@ import type { CSSProperties } from "react";
 const STEPS = [
   {
     title: "Discover",
-    copy: "We learn your business, your buyer, and what the brand and site need to do.",
+    copy: "We review your goals, existing workflows, and user needs to agree on a clear scope and priorities.",
     progress: 25,
   },
   {
-    title: "Design",
-    copy: "We shape the brand and the site, testing directions until it is right.",
+    title: "Plan",
+    copy: "We define the user experience, system architecture, and delivery milestones before development begins.",
     progress: 50,
     accent: true,
   },
   {
     title: "Build",
-    copy: "We build it fast and clean, ready for your team to run.",
+    copy: "We develop and test in stages, sharing progress for your review. AI assists delivery; our engineers own the decisions and quality.",
     progress: 75,
   },
   {
     title: "Launch",
-    copy: "We launch, hand over, and stay on to help it grow.",
+    copy: "We prepare the release, help your team get started, and agree on the support and improvements your software needs next.",
     progress: 100,
   },
 ] as const;
@@ -37,10 +37,10 @@ export default function Flow() {
         </div>
         <div className="flow-header-right">
           <p className="flow-lede">
-            How we turn a brief into a brand and a site that performs.
+            A clear process. Direct communication. Progress you can review.
           </p>
           <p className="flow-meta">
-            Duration: <strong>~ 1 month</strong>
+            Delivery: <strong>agreed milestones</strong>
           </p>
         </div>
       </ScrollReveal>

@@ -190,7 +190,7 @@ export default function Tools() {
   return (
     <section className="tools" id="tools">
       <ScrollReveal as="div" className="tools-heading">
-        <h2 className="tools-title">Tools we’ve mastered</h2>
+        <h2 className="tools-title">Technology we build with</h2>
       </ScrollReveal>
 
       <ScrollReveal as="div" className="tools-pill" delay={100}>

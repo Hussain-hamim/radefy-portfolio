@@ -8,8 +8,11 @@ export type TeamPerson = {
   name: string;
   role: string;
   image: string;
-  x: string;
-  linkedin: string;
+  website: string;
+  x?: string;
+  linkedin?: string;
+  github?: string;
+  instagram?: string;
 };
 
 const EASE = "cubic-bezier(0.22, 1, 0.36, 1)";
@@ -363,7 +366,7 @@ export default function TeamSystem({ people }: { people: readonly TeamPerson[] }
 
   return (
     <div className="team-people" ref={rootRef}>
-      <h2 className="team-people-title">Meet our team</h2>
+      <h2 className="team-people-title">Meet the team</h2>
 
       <div className="team-system-stage">
         <svg className="team-scaffold" aria-hidden="true">
@@ -398,7 +401,14 @@ export default function TeamSystem({ people }: { people: readonly TeamPerson[] }
                     className="team-avatar-image"
                   />
                   <span className="team-socials">
-                    <a
+                    <a className="team-social" href={person.website} target="_blank" rel="noopener noreferrer" aria-label={`Visit ${person.name}’s personal website`} title="Personal website">
+                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+                        <circle cx="12" cy="12" r="9" />
+                        <ellipse cx="12" cy="12" rx="4" ry="9" />
+                        <path d="M3 12h18" />
+                      </svg>
+                    </a>
+                    {person.x && <a
                       className="team-social"
                       href={person.x}
                       target="_blank"
@@ -406,8 +416,8 @@ export default function TeamSystem({ people }: { people: readonly TeamPerson[] }
                       aria-label={`${person.name} on X`}
                     >
                       <SocialIconX />
-                    </a>
-                    <a
+                    </a>}
+                    {person.linkedin && <a
                       className="team-social"
                       href={person.linkedin}
                       target="_blank"
@@ -415,7 +425,13 @@ export default function TeamSystem({ people }: { people: readonly TeamPerson[] }
                       aria-label={`${person.name} on LinkedIn`}
                     >
                       <SocialIconLinkedin />
-                    </a>
+                    </a>}
+                    {person.github && <a className="team-social" href={person.github} target="_blank" rel="noopener noreferrer" aria-label={`${person.name} on GitHub`} title="GitHub">
+                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><path d="M9 22v-4c-4 1-4-2-6-3m12 7v-4c0-1-.3-2-1-2.5 4-.5 6-2 6-6a5 5 0 0 0-1.5-3.5c.3-1 .3-2 0-3-2 0-3 1-3 1a12 12 0 0 0-7 0s-1-1-3-1c-.3 1-.3 2 0 3A5 5 0 0 0 4 9.5c0 4 2 5.5 6 6-.7.5-1 1.5-1 2.5" /></svg>
+                    </a>}
+                    {person.instagram && <a className="team-social" href={person.instagram} target="_blank" rel="noopener noreferrer" aria-label={`${person.name} on Instagram`} title="Instagram">
+                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" /><circle cx="12" cy="12" r="4" /><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" /></svg>
+                    </a>}
                   </span>
                 </span>
               </div>
