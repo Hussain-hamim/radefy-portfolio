@@ -1160,6 +1160,58 @@ html.is-signature-playing .hero-main {
   }
 }
 
+/* Continuous project marquee, without scroll pinning. */
+.projects-marquee-section { padding: 3rem 0; }
+.projects-marquee-section .projects-header { margin-bottom: 1.75rem; height: auto; }
+.projects-marquee-toggle {
+  padding: 0.5rem 0.9rem;
+  border: 1px solid rgb(35 33 75 / 0.15);
+  border-radius: 999px;
+  color: var(--navy);
+  background: white;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.8rem;
+}
+.projects-marquee { overflow: hidden; padding: 6px 0; }
+.projects-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: projects-marquee-travel 48s linear infinite;
+}
+.projects-marquee-group { display: flex; gap: 1.5rem; padding-right: 1.5rem; }
+.projects-marquee-item { width: clamp(280px, 82vw, 440px); flex: none; }
+.projects-marquee .project-card-media { flex: none; aspect-ratio: 16 / 10; }
+.projects-marquee .project-card-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 1.25rem;
+}
+.projects-marquee .project-card-aside {
+  flex-direction: row;
+  align-items: center;
+  margin-top: auto;
+}
+.projects-marquee .project-card-name { font-size: 1.4rem; }
+.projects-marquee .project-card-tag { text-align: left; }
+.projects-marquee .project-card-cta { opacity: 1; color: var(--brand); }
+.projects-marquee[data-paused="true"] .projects-marquee-track,
+.projects-marquee:hover .projects-marquee-track,
+.projects-marquee:focus-within .projects-marquee-track { animation-play-state: paused; }
+/* Focused cards stay reachable in a static, horizontally scrollable list. */
+.projects-marquee:focus-within { overflow-x: auto; }
+.projects-marquee:focus-within .projects-marquee-track { animation: none; }
+.projects-marquee:focus-within .projects-marquee-group[aria-hidden] { display: none; }
+@keyframes projects-marquee-travel { to { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) {
+  .projects-marquee { overflow-x: auto; }
+  .projects-marquee-track { animation: none; }
+  .projects-marquee-group[aria-hidden],
+  .projects-marquee-toggle { display: none; }
+}
+
 /* —— About —— */
 .about {
   position: relative;
