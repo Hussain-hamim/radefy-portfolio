@@ -8,7 +8,6 @@ import Projects from "./components/Projects";
 import Services from "./components/Services";
 import SiteHeader from "./components/SiteHeader";
 import StartButton from "./components/StartButton";
-import Team from "./components/Team";
 import Tools from "./components/Tools";
 import Flow from "./components/Flow";
 import Testimonials from "./components/Testimonials";
@@ -71,7 +70,6 @@ export default function Home() {
 
       <Projects />
       <About />
-      <Team />
       <Services />
       <Tools />
       <Flow />
